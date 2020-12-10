@@ -1,0 +1,93 @@
+#bg-music {
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  min-width: 3em;
+  min-height: 3em;
+  border-radius: 3em;
+  background-color: red;
+}
+
+#bg-music .volume-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 3em;
+}
+
+#bg-music .volume-icon * {
+  font-size: 1.5em;
+}
+
+#bg-music .slider-container {
+  display: none;
+  width: 6em;
+  height: 3em;
+  padding-right: 1em;
+  border-radius: 3em;
+  background-color: red;
+}
+
+#bg-music .slider-container #bg-music-slider {
+  -webkit-appearance: none;
+  /* Override default CSS styles */
+  appearance: none;
+  outline: none;
+  width: 100%;
+  height: 0.5em;
+  border-radius: 1em;
+}
+
+#bg-music .slider-container #bg-music-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  /* Override default look */
+  appearance: none;
+  width: 1em;
+  /* Set a specific slider handle width */
+  height: 1em;
+  /* Slider handle height */
+  border-radius: 1em;
+  background: #4CAF50;
+  /* Green background */
+  cursor: pointer;
+  /* Cursor on hover */
+}
+
+#bg-music .slider-container #bg-music-slider ::-moz-range-thumb {
+  width: 25px;
+  /* Set a specific slider handle width */
+  height: 25px;
+  /* Slider handle height */
+  background: #4CAF50;
+  /* Green background */
+  cursor: pointer;
+}
+
+#bg-music:hover {
+  animation: extend 0.2s ease-in-out;
+}
+
+#bg-music:hover .slider-container {
+  display: inline-flex;
+  align-items: center;
+  animation: appear 0.2s ease-in-out;
+}
+
+@keyframes extend {
+  0% {
+    width: 4em;
+  }
+  100% {
+    width: 9em;
+  }
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
