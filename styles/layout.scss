@@ -1,5 +1,10 @@
 @import 'vars.scss';
+@import 'button.scss';
 @import 'music-button.scss';
+
+body {
+  background-color: $back-clr;
+}
 
 main {
   display: flex;

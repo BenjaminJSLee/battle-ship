@@ -1,3 +1,7 @@
+button {
+  outline: none;
+}
+
 #bg-music {
   animation: shrink 0.2s ease-in-out;
   display: inline-flex;
@@ -120,6 +124,10 @@
     width: 0em;
     opacity: 1;
   }
+}
+
+body {
+  background-color: skyblue;
 }
 
 main {
