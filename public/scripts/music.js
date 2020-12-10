@@ -14,7 +14,7 @@ $( function() {
     if (!isPlaying) className = "fas fa-music";
     else if ($slider.val() >= 50) className = "fas fa-volume-up";
     else if($slider.val() > 0) className = "fas fa-volume-down";
-    else className = "fas fa-off";
+    else className = "fas fa-volume-mute";
     $icon.removeClass().addClass(className);
   });
   $music.on("mouseenter", function() {

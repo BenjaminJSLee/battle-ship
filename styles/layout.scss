@@ -1,1 +1,12 @@
+@import 'vars.scss';
 @import 'music-button.scss';
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 20em;
+  margin: auto;
+}
