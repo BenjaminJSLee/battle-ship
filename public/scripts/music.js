@@ -6,6 +6,7 @@ $( function() {
   const $music = $("#bg-music");
   const $icon = $("#bg-music .volume-icon i");
   const $slider = $("#bg-music-slider");
+  music.volume = $slider.val() / 100;
   $slider.on('input', function(evt) {
     music.volume = evt.target.value / 100;
   });

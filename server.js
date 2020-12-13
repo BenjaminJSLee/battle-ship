@@ -21,6 +21,9 @@ app.use("/styles", sass({
 
 app.use(express.static('public'));
 
+const gamesRoutes = require('./routes/games.js');
+
+app.use('/games', gamesRoutes());
 
 app.get('/', (req, res) => {
   res.render('ship_index',req.tempVars);

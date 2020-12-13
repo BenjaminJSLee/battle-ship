@@ -1,0 +1,46 @@
+#stage {
+  width: 100%;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  .game-container {
+    max-width: 800px;
+    width: 100%;
+    height: 400px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    .board-container {
+      flex: 1 1 0;
+      height: 50%;
+    }
+  }
+  .stats {
+    background-color: #000000;
+  }
+  .buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    .button-container {
+      width: 100%;
+      height: 100%;
+      padding: 1em;
+      button {
+        &#fire-button {
+          color: #FFFFFF;
+          background-color: #F31431;
+        }
+      }
+    }
+  }
+}
+
+.spotlight {
+  flex-grow: 10;
+}
+
+.sideshow {
+  flex-shrink: 10;
+}
