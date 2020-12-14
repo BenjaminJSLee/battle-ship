@@ -1,19 +1,55 @@
 #stage {
-  width: 100%;
-  height: 600px;
+  max-width: 800px;
+  width: $stage-width;
+  margin: auto;
   display: flex;
   flex-direction: column;
+  > * {
+    margin-bottom: 1em;
+  }
   .game-container {
-    max-width: 800px;
     width: 100%;
-    height: 400px;
+    max-height: 480px;
+    height: $stage-width * 6/10;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
     .board-container {
-      flex: 1 1 0;
-      height: 50%;
+      animation: board-shrink 1s ease-in-out 0s;
+      width: 40%;
+      height: 66.666%;
+      background-color: steelblue;
+      padding: 1em;
+      border-radius: 1em;
+      box-shadow: 0.2em 0.2em 0.8em 0.2em black;
+      @keyframes board-grow {
+        0% {
+          width: 40%;
+          height: 66.666%;
+        }
+        100% {
+          width: 60%;
+          height: 100%;
+        }
+      }
+      @keyframes board-shrink {
+        0% {
+          width: 60%;
+          height: 100%;
+        }
+        100% {
+          width: 40%;
+          height: 66.666%;
+        }
+      }
+      &.spotlight {
+        z-index: 20;
+        animation: board-grow 1s ease-in-out 0s;
+        width: 60%;
+        height: 100%;
+      }
+
     }
   }
   .stats {
@@ -26,7 +62,7 @@
     .button-container {
       width: 100%;
       height: 100%;
-      padding: 1em;
+      padding: 0.1em;
       button {
         &#fire-button {
           color: #FFFFFF;
@@ -35,12 +71,4 @@
       }
     }
   }
-}
-
-.spotlight {
-  flex-grow: 10;
-}
-
-.sideshow {
-  flex-shrink: 10;
 }

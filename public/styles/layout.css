@@ -144,16 +144,21 @@ button:hover {
 }
 
 #stage {
-  width: 100%;
-  height: 600px;
+  max-width: 800px;
+  width: 90vw;
+  margin: auto;
   display: flex;
   flex-direction: column;
 }
 
+#stage > * {
+  margin-bottom: 1em;
+}
+
 #stage .game-container {
-  max-width: 800px;
   width: 100%;
-  height: 400px;
+  max-height: 480px;
+  height: 54vw;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -161,8 +166,42 @@ button:hover {
 }
 
 #stage .game-container .board-container {
-  flex: 1 1 0;
-  height: 50%;
+  animation: board-shrink 1s ease-in-out 0s;
+  width: 40%;
+  height: 66.666%;
+  background-color: steelblue;
+  padding: 1em;
+  border-radius: 1em;
+  box-shadow: 0.2em 0.2em 0.8em 0.2em black;
+}
+
+@keyframes board-grow {
+  0% {
+    width: 40%;
+    height: 66.666%;
+  }
+  100% {
+    width: 60%;
+    height: 100%;
+  }
+}
+
+@keyframes board-shrink {
+  0% {
+    width: 60%;
+    height: 100%;
+  }
+  100% {
+    width: 40%;
+    height: 66.666%;
+  }
+}
+
+#stage .game-container .board-container.spotlight {
+  z-index: 20;
+  animation: board-grow 1s ease-in-out 0s;
+  width: 60%;
+  height: 100%;
 }
 
 #stage .stats {
@@ -178,7 +217,7 @@ button:hover {
 #stage .buttons .button-container {
   width: 100%;
   height: 100%;
-  padding: 1em;
+  padding: 0.1em;
 }
 
 #stage .buttons .button-container button#fire-button {
@@ -186,17 +225,7 @@ button:hover {
   background-color: #F31431;
 }
 
-.spotlight {
-  flex-grow: 10;
-}
-
-.sideshow {
-  flex-shrink: 10;
-}
-
 div.game-board {
-  display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100%;
   border: 0.2em solid black;
@@ -204,54 +233,66 @@ div.game-board {
   background-color: grey;
 }
 
-div.game-board div.row {
+div.game-board div.table-body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+div.game-board div.table-body div.row {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: row;
 }
 
-div.game-board div.row div {
+div.game-board div.table-body div.row div {
   flex: auto;
   width: 100%;
   height: 100%;
-  border: 2px solid grey;
+  border: 0.05em solid grey;
   background-color: white;
 }
 
-div.game-board div.row div.top.left {
+div.game-board div.table-body div.row div.top.left {
   border-radius: 0.5em 0em 0em 0em;
 }
 
-div.game-board div.row div.top.right {
+div.game-board div.table-body div.row div.top.right {
   border-radius: 0em 0.5em 0em 0em;
 }
 
-div.game-board div.row div.bottom.left {
+div.game-board div.table-body div.row div.bottom.left {
   border-radius: 0em 0em 0em 0.5em;
 }
 
-div.game-board div.row div.bottom.right {
+div.game-board div.table-body div.row div.bottom.right {
   border-radius: 0em 0em 0.5em 0em;
 }
 
-div.game-board div.row div:hover {
-  border: 2px solid silver;
+div.game-board div.table-body div.row div.selected {
+  border: 0.05em solid silver;
+  background-color: red;
+}
+
+div.spotlight div.game-board div.table-body div.row div {
+  border: 0.15em solid grey;
+}
+
+div.spotlight div.game-board div.table-body div.row div:hover {
+  border: 0.15em solid silver;
   background-color: aliceblue;
 }
 
-div.game-board div.row div.selected {
-  border: 2px solid silver;
-  background-color: aliceblue;
+div.spotlight div.game-board div.table-body div.row div.selected {
+  border: 0.15em solid silver;
+  background-color: red;
 }
 
 html {
   height: 90%;
   box-sizing: border-box;
-}
-
-*, *:before, *:after {
-  box-sizing: inherit;
 }
 
 body {
@@ -264,7 +305,7 @@ main {
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 20em;
+  max-width: 1000px;
   margin: auto;
 }
 

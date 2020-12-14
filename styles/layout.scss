@@ -2,15 +2,12 @@
 @import 'button.scss';
 @import 'music-button.scss';
 @import 'game-board.scss';
+@import 'game-stats.scss';
 @import 'board.scss';
 
 html {
   height: 90%;
   box-sizing: border-box;
-}
-
-*, *:before, *:after {
-  box-sizing: inherit;
 }
 
 body {
@@ -23,7 +20,7 @@ main {
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 20em;
+  max-width: 1000px;
   margin: auto;
 
   .content {
