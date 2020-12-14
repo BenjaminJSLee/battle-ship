@@ -1,3 +1,4 @@
+$.event.addProp('dataTransfer');
 $( function() {
   const { $player, changeMusic } = createMusicPlayer(`/sounds/sea-shanty2.mp3`);
   $('body').prepend($player);

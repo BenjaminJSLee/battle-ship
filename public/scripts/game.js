@@ -55,7 +55,7 @@ const createButtons = function(boardShots) {
 
 const createStats = function() {
   const $stats = $(`
-    <div class="stats">
+    <div id="pooplol" class="stats" draggable="true" style="width: 10px; height: 10px">
       <div class="ships"></div>
       <div class="shots">
         <div class="hits">Hits: <span>0</span></div>
@@ -63,17 +63,31 @@ const createStats = function() {
       </div>
     </div> 
   `);
+  $stats.on('dragstart', function(evt) {
+    console.log(evt.target.id);
+    evt.dataTransfer.setData("text", evt.target.id);
+    evt.dataTransfer.dropEffect = "move";
+  });
   return $stats;
 }
 
 const createGame = function({rows, cols}) {
   const $gameStage = $(`<section id="stage"></section>`);
-  
   const $gameContainer = $(`<div class="game-container"></div>`);
-  const $myBoard = $(`<div class="board-container spotlight"></div>`).append(createGameBoard(rows,cols,"shoot"));
-  const $enemyBoard = $(`<div class="board-container"></div>`).append(createGameBoard(rows,cols,"defend"));
-  const boardShots = addBoardListener($myBoard);
-  $gameContainer.append($myBoard).append($enemyBoard);
+  const $shootingBoard = $(`<div class="board-container spotlight"></div>`).append(createGameBoard(rows,cols,"shoot"));
+  const $defendingBoard = $(`<div class="board-container"></div>`).append(createGameBoard(rows,cols,"defend"));
+  $defendingBoard.on('drop', function(evt) {
+    evt.preventDefault();
+    const data = evt.dataTransfer.getData("text");
+    console.log(data);
+    evt.target.appendChild(document.getElementById(data));
+  });
+  $defendingBoard.on('dragover', function(evt) {
+    evt.preventDefault();
+    if (evt.target !== this) evt.target.innerHTML = "W";
+  })
+  const boardShots = addBoardListener($shootingBoard);
+  $gameContainer.append($shootingBoard).append($defendingBoard);
   $gameStage.append(createStats());
   $gameStage.append($gameContainer);
   $gameStage.append(createButtons(boardShots));
