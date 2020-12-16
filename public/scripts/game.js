@@ -1,20 +1,3 @@
-const createGameBoard = function(rows, cols, id) {
-  const $board = $(`
-    <div id="board-${id}" class="game-board">
-    </div>
-  `);
-  const $table = $(`<div class="table-body"></div>`);
-  for(let i = 0; i < rows; i++) {
-    const $row = $(`<div class="row"></div>`);
-    for(let j = 0; j < cols; j++) {
-      let newClass = `${(i === 0 ? "top" : i === rows - 1 ? "bottom" : "")}`;
-      newClass = `${newClass ? newClass + " " : ""}${(j === 0 ? "left" : j === cols - 1 ? "right" : "")}`;
-      $row.append(`<div data-row="${i}" data-col="${j}" class="${newClass}"></div>`);
-    }
-    $table.append($row);
-  }
-  return $board.append($table);
-};
 
 const addBoardListener = function($board, history = {}) {
   const boardShots = history;
@@ -40,56 +23,90 @@ const addFireListener = function($button, boardShots) {
     if (boardShots[row] && boardShots[row][col]) return;
     if (boardShots[row] === undefined) boardShots[row] = { [col]: true };
     else boardShots[row][col] = true;
-    $(`#board-shoot .row div[data-row="${row}"][data-col="${col}"]`).text("X");
+    $(`#board-shoot .row div[data-row="${row}"][data-col="${col}"]`).removeClass('selected').text("X");
   });
 };
 
-const createButtons = function(boardShots) {
-  const $buttons = $(`<div class="buttons"></div>`);
-  const $fire = $(`<button id="fire-button">FIRE</button>`);
-  addFireListener($fire, boardShots)
-  $buttons.prepend($fire);
-  $buttons.append(`<div class="button-container"><button id="marker-button">MARKER</button></div>`);
-  return $buttons;
+
+
+
+const startCombat = function({ $game, rows, cols }, ships, transition) {
+  
+};
+
+const getSetUpHandlers = function({ $game, rows, cols }, ships, transition) {
+  const events = [];
+  let curShip = null;
+  const shipClickHandler = function(evt) {
+    const $target = $(evt.target);
+    const shipId = $target.attr(`data-ship-id`);
+    if (shipId === undefined) return;
+    if (curShip === ships[shipId]) rotateShip(ship, rows, cols);
+  };
+  events.push({ $target: $game.find(``), type: "click", handler: shipClickHandler});
+
+  const boardClickHandler = function(evt) {
+    const $target = $(evt.target);
+
+  };
+  events.push({ $target: $game.find(``), type: "click", handler: boardClickHandler});
+
+  const boardHoverHandler = function(evt) {
+    const $target = $(evt.target);
+
+  };
+  events.push({ $target: $game.find(``), type: "mouseover", handler: boardHoverHandler});
+  
+  const boardSubmitHandler = function(evt) {
+    const $target = $(evt.target);
+
+  };
+  events.push({ $target: $game.find(``), type: "click", handler: boardSubmitHandler});
+
+  return events;
 }
 
-const createStats = function() {
-  const $stats = $(`
-    <div id="pooplol" class="stats" draggable="true" style="width: 10px; height: 10px">
-      <div class="ships"></div>
-      <div class="shots">
-        <div class="hits">Hits: <span>0</span></div>
-        <div class="misses">Misses: <span>0</span></div>
-      </div>
-    </div> 
-  `);
-  $stats.on('dragstart', function(evt) {
-    console.log(evt.target.id);
-    evt.dataTransfer.setData("text", evt.target.id);
-    evt.dataTransfer.dropEffect = "move";
-  });
-  return $stats;
+const getGameHandlers = function({ $game, rows, cols }, ships, transition) {
+
 }
+
+const setEventHandlers = function(events) {
+  for (const event of events) {
+    event.$target.on(event.type, event.handler);
+  }
+}
+
+const removeEventHandlers = function(events) {
+  for (const event of events) {
+    event.$target.off(event.type, event.handler);
+  }
+}
+
+const setupPhase = function(game, ships) {
+  const SETUP = "SETUP";
+  const CLEANUP = "CLEANUP";
+  const START = "START";
+  let events = [];
+  const transition = function(phase) {
+    if (phase === SETUP) setEventHandlers(events);
+    else if(phase === CLEANUP) removeEventHandlers(events);
+    else if(phase === START) {
+      removeEventHandlers(events);
+      events = startCombat(game, ships, this);
+    } else if (phase === RESTART) {
+      removeEventHandlers(events);
+      events = getSetUpHandlers(game, ships, this);
+    }
+  };
+  transition(RESTART);
+};
 
 const createGame = function({rows, cols}) {
-  const $gameStage = $(`<section id="stage"></section>`);
-  const $gameContainer = $(`<div class="game-container"></div>`);
-  const $shootingBoard = $(`<div class="board-container spotlight"></div>`).append(createGameBoard(rows,cols,"shoot"));
-  const $defendingBoard = $(`<div class="board-container"></div>`).append(createGameBoard(rows,cols,"defend"));
-  $defendingBoard.on('drop', function(evt) {
-    evt.preventDefault();
-    const data = evt.dataTransfer.getData("text");
-    console.log(data);
-    evt.target.appendChild(document.getElementById(data));
-  });
-  $defendingBoard.on('dragover', function(evt) {
-    evt.preventDefault();
-    if (evt.target !== this) evt.target.innerHTML = "W";
-  })
-  const boardShots = addBoardListener($shootingBoard);
-  $gameContainer.append($shootingBoard).append($defendingBoard);
-  $gameStage.append(createStats());
-  $gameStage.append($gameContainer);
-  $gameStage.append(createButtons(boardShots));
-  return $gameStage;
+  const { $ships, ships } = setupShips();
+  const $game = createGameElement(rows, cols);
+  $game.find(`div.stats`).prepend($ships);
+
+  setupPhase({ $game, rows, cols }, ships);
+
+  return $game;
 };
