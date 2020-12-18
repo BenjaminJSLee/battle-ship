@@ -86,6 +86,7 @@ const setupPhase = function(game, ships) {
   const SETUP = "SETUP";
   const CLEANUP = "CLEANUP";
   const START = "START";
+  const RESTART = "RESTART";
   let events = [];
   const transition = function(phase) {
     if (phase === SETUP) setEventHandlers(events);

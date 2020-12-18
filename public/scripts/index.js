@@ -2,7 +2,10 @@ $.event.addProp('dataTransfer');
 $( function() {
   const { $player, changeMusic } = createMusicPlayer(`/sounds/sea-shanty2.mp3`);
   $('body').prepend($player);
-
+  $(`body`).on('click', function() {
+    changeMusic(null, true);
+    $(this).off();
+  });
   $("#vs-ai").on('click', function() {
     $('main').empty();
     changeMusic(`/sounds/sea-shanty.mp3`, true);

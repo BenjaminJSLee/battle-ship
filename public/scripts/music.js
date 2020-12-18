@@ -79,7 +79,7 @@ const createMusicPlayer = function(filename) {
   music.src = filename;
   music.loop = true;
   const changeMusic = function(newFile, play = false) {
-    music.src = newFile;
+    music.src = newFile || filename;
     if (play) music.play();
   }
   return { $player: createPlayer(music), changeMusic };
