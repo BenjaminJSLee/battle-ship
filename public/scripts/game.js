@@ -34,60 +34,74 @@ const startCombat = function({ $game, rows, cols }, ships, transition) {
   
 };
 
-const getAdjustedPos = function(point, max) {
-  shipStart = row - center;
+const adjustForBounds = function(point, max, len) {
   if (point < 0) {
     return 0;
-  } else if (point + ship.length >= max) {
-    return point - (point + ship.length - max);
+  } else if (point + len >= max) {
+    return point - (point + len - max);
+  }
+  return point;
+}
+
+const getAdjustedPos = function(isVert, len, {row, col}, {rows, cols}) {
+  const center = Math.floor(len/2);
+  if (isVert) {
+    return adjustForBounds(row - center, rows, len)
+  } else { 
+    return adjustForBounds(col - center, cols, len)
   }
 }
 
 const getSetUpHandlers = function({ $game, rows, cols }, ships, transition) {
   const events = [];
   let curShip = null;
-  let isVert = false;
+  let isVert = true;
   const shipClickHandler = function(evt) {
-    const $target = $(evt.target);
+    const $target = $(this);
     const shipId = $target.attr(`data-ship-id`);
     if (shipId === undefined) return;
-    if (curShip === shipId) rotateShip(ship, rows, cols);
+    if (curShip === shipId) {
+      isVert = !isVert;
+    }
+    curShip = shipId;
   };
-  events.push({ $target: $game.find(``), type: "click", handler: shipClickHandler});
+  events.push({ $target: $game.find(`[data-ship-id]`), type: "click", handler: shipClickHandler});
 
   const boardClickHandler = function(evt) {
-    const $target = $(evt.target);
-
-  };
-  events.push({ $target: $game.find(``), type: "click", handler: boardClickHandler});
-
-  const boardHoverHandler = function(evt) {
-    // if (!ships[curShip]) return;
-    let ship = ships[curShip] || { length: 5 };
+    if (!ships[curShip]) return;
+    let ship = ships[curShip];
+    if (isVert && ship.length > rows) return;
+    if (!isVert && ship.length > cols) return;
     const $target = $(evt.target);
     const row = Number($target.attr(`data-row`));
     const col = Number($target.attr(`data-col`));
     if (Number.isNaN(row) || Number.isNaN(col)) return;
-    $(this).find(`.hover`).removeClass("hover");
-    const center = Math.floor(ship.length/2);
-    let shipStart = -1;
-    if (isVert) {
-      shipStart = row - center;
-      if (shipStart < 0) {
-        shipStart = 0;
-      } else if (shipStart + ship.length >= rows) {
-        shipStart = shipStart - (shipStart + ship.length - rows);
-      }
-    } else { 
-      shipStart = col - center;
-      if (shipStart < 0) {
-        shipStart = 0;
-      } else if (shipStart + ship.length >= cols) {
-        shipStart = shipStart - (shipStart + ship.length - cols);
-      }
-    }
+    const $board = $(this);
+    $board.find(`.hover`).removeClass("hover");
+    const shipStart = getAdjustedPos(isVert, ship.length, {row, col}, {rows, cols});
     for(let i = shipStart; i < shipStart + ship.length; i++) {
-      $(this).find(`[data-${isVert ? `row=${i}` : `col=${i}`}][data-${!isVert ? `row=${row}` : `col=${col}`}]`).addClass("hover");
+      $board
+        .find(`[data-${isVert ? "row" : "col"}=${i}][data-${!isVert ? `row=${row}` : `col=${col}`}]`)
+        .addClass("selected");
+    }
+
+  };
+  events.push({ $target: $game.find(`[data-board="defend"]`), type: "click", handler: boardClickHandler});
+
+  const boardHoverHandler = function(evt) {
+    if (!ships[curShip]) return;
+    let ship = ships[curShip];
+    const $target = $(evt.target);
+    const row = Number($target.attr(`data-row`));
+    const col = Number($target.attr(`data-col`));
+    if (Number.isNaN(row) || Number.isNaN(col)) return;
+    const $board = $(this);
+    $board.find(`.hover`).removeClass("hover");
+    const shipStart = getAdjustedPos(isVert, ship.length, {row, col}, {rows, cols});
+    for(let i = shipStart; i < shipStart + ship.length; i++) {
+      $board
+        .find(`[data-${isVert ? "row" : "col"}=${i}][data-${!isVert ? `row=${row}` : `col=${col}`}]`)
+        .addClass("hover");
     }
   };
   events.push({ $target: $game.find(`[data-board="defend"]`), type: "mouseover", handler: boardHoverHandler});

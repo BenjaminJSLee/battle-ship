@@ -1,24 +1,12 @@
-const rotateShip = function({start, end}, xMax, yMax) {
-  let tmpStart = start;
-  let tmpEnd = end;
-  if (tmpEnd.x === tmpStart.x) {
-    tmpEnd.x = (tmpStart.y - tmpEnd.y) + tmpEnd.x;
-    tmpEnd.y = tmpStart.y;
-  } else if(tmpEnd.y === tmpStart.y) {
-    tmpEnd.y = (tmpStart.x - tmpEnd.x) + tmpEnd.y;
-    tmpEnd.x = tmpStart.x;
-  }
-  if (tmpEnd.x < 0 || tmpEnd.y < 0 || tmpEnd.x >= xMax || tmpEnd.y >= yMax) return null;
-  return { start: tmpStart, end: tmpEnd };
-} 
 
 const createShip = function(id, length) {
   return {
     id,
-    start: {x: -1, y: -1},
-    end: {x: -1, y: -1},
+    start: {x: null, y: null},
+    end: {x: null, y: null},
     hits: [],
     length,
+    isVert: true,
     isHit(coord) {
       const {x , y} = coord;
       if (x === undefined || y === undefined) return false;
@@ -53,7 +41,7 @@ const createShipElement = function(ship) {
 const createShipsElement = function(shipLens) {
   const ships = {};
   const $ships = $(`<div class="ships"></div>`);
-  for (let i = 0; i < shipLens; i++) {
+  for (let i = 0; i < shipLens.length; i++) {
     const ship = createShip(i + 1, shipLens[i]);
     const $ship = createShipElement(ship);
     ships[ship.id] = ship;

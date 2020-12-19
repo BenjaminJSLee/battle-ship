@@ -1,0 +1,14 @@
+div.ships {
+  display: flex;
+  flex-direction: row;
+  .ship {
+    display: inline-flex;
+    margin: 1em;
+    .block {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+    }
+  }
+}
