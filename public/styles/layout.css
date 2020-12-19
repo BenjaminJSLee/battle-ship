@@ -91,6 +91,7 @@ button:hover {
 }
 
 #bg-music:hover {
+  /* Extend to show range slider */
   animation: extend 0.2s ease-in-out;
 }
 
@@ -278,17 +279,17 @@ div.game-board div.table-body div.row div.selected {
 }
 
 div.spotlight div.game-board div.table-body div.row div {
-  border: 0.15em solid grey;
-}
-
-div.spotlight div.game-board div.table-body div.row div:hover {
-  border: 0.15em solid silver;
-  background-color: aliceblue;
+  border: 0.1em solid grey;
 }
 
 div.spotlight div.game-board div.table-body div.row div.selected {
-  border: 0.15em solid silver;
+  border: 0.1em solid silver;
   background-color: red;
+}
+
+div[data-board=defend] div.game-board div.table-body div.row div.tuple.hover {
+  border: 0.1em solid black;
+  background-color: darkgrey;
 }
 
 html {

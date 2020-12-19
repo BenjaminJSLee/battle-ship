@@ -39,9 +39,9 @@ const createGameElement = function(rows, cols) {
   const $gameStage = $(`<section id="stage"></section>`);
 
   const $gameContainer = $(`<div class="game-container"></div>`);
-  const $shootingBoard = $(`<div class="board-container"></div>`)
+  const $shootingBoard = $(`<div data-board="attack" class="board-container"></div>`)
   $shootingBoard.append(createBoardElement(rows,cols,"shoot"));
-  const $defendingBoard = $(`<div class="board-container spotlight"></div>`)
+  const $defendingBoard = $(`<div data-board="defend" class="board-container spotlight"></div>`)
   $defendingBoard.append(createBoardElement(rows,cols,"defend"));
   $gameContainer.append($shootingBoard).append($defendingBoard);
 

@@ -58,7 +58,7 @@
     }
   }
   
-  &:hover {
+  &:hover { /* Extend to show range slider */
     animation: extend 0.2s ease-in-out;
     .slider-container {
       animation: appear 0.2s ease-in-out;

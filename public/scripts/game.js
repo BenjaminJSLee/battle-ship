@@ -34,14 +34,24 @@ const startCombat = function({ $game, rows, cols }, ships, transition) {
   
 };
 
+const getAdjustedPos = function(point, max) {
+  shipStart = row - center;
+  if (point < 0) {
+    return 0;
+  } else if (point + ship.length >= max) {
+    return point - (point + ship.length - max);
+  }
+}
+
 const getSetUpHandlers = function({ $game, rows, cols }, ships, transition) {
   const events = [];
   let curShip = null;
+  let isVert = false;
   const shipClickHandler = function(evt) {
     const $target = $(evt.target);
     const shipId = $target.attr(`data-ship-id`);
     if (shipId === undefined) return;
-    if (curShip === ships[shipId]) rotateShip(ship, rows, cols);
+    if (curShip === shipId) rotateShip(ship, rows, cols);
   };
   events.push({ $target: $game.find(``), type: "click", handler: shipClickHandler});
 
@@ -52,10 +62,35 @@ const getSetUpHandlers = function({ $game, rows, cols }, ships, transition) {
   events.push({ $target: $game.find(``), type: "click", handler: boardClickHandler});
 
   const boardHoverHandler = function(evt) {
+    // if (!ships[curShip]) return;
+    let ship = ships[curShip] || { length: 5 };
     const $target = $(evt.target);
-
+    const row = Number($target.attr(`data-row`));
+    const col = Number($target.attr(`data-col`));
+    if (Number.isNaN(row) || Number.isNaN(col)) return;
+    $(this).find(`.hover`).removeClass("hover");
+    const center = Math.floor(ship.length/2);
+    let shipStart = -1;
+    if (isVert) {
+      shipStart = row - center;
+      if (shipStart < 0) {
+        shipStart = 0;
+      } else if (shipStart + ship.length >= rows) {
+        shipStart = shipStart - (shipStart + ship.length - rows);
+      }
+    } else { 
+      shipStart = col - center;
+      if (shipStart < 0) {
+        shipStart = 0;
+      } else if (shipStart + ship.length >= cols) {
+        shipStart = shipStart - (shipStart + ship.length - cols);
+      }
+    }
+    for(let i = shipStart; i < shipStart + ship.length; i++) {
+      $(this).find(`[data-${isVert ? `row=${i}` : `col=${i}`}][data-${!isVert ? `row=${row}` : `col=${col}`}]`).addClass("hover");
+    }
   };
-  events.push({ $target: $game.find(``), type: "mouseover", handler: boardHoverHandler});
+  events.push({ $target: $game.find(`[data-board="defend"]`), type: "mouseover", handler: boardHoverHandler});
   
   const boardSubmitHandler = function(evt) {
     const $target = $(evt.target);
@@ -97,6 +132,7 @@ const setupPhase = function(game, ships) {
     } else if (phase === RESTART) {
       removeEventHandlers(events);
       events = getSetUpHandlers(game, ships, this);
+      transition(SETUP);
     }
   };
   transition(RESTART);
