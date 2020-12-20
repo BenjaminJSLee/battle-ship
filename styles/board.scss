@@ -63,4 +63,7 @@ div[data-board=defend] div.game-board div.table-body div.row div.tuple {
     border: 0.1em solid black;
     background-color: darkgrey;
   }
+  &[data-ship-id] {
+    background-color: green;
+  }
 }

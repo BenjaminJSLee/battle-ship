@@ -10,12 +10,9 @@ const createStatsElement = function() {
   return $stats;
 }
 
-const createButtonsElement = function() {
-  const $buttons = $(`<div class="buttons"></div>`);
-  const $fire = $(`<button id="fire-button">FIRE</button>`);
-  $buttons.prepend($fire);
-  return $buttons;
-}
+const createButton = function(action, txt = null) {
+  return $(`<button class="${action}" data-button-id="${action}">${txt || action}</button>`);
+};
 
 const createBoardElement = function(rows, cols, id) {
   const $board = $(`
@@ -36,7 +33,7 @@ const createBoardElement = function(rows, cols, id) {
 };
 
 const createGameElement = function(rows, cols) {
-  const $gameStage = $(`<section id="stage"></section>`);
+  const $gameStage = $(`<section id="stage"><div class="buttons"></div></section>`);
 
   const $gameContainer = $(`<div class="game-container"></div>`);
   const $shootingBoard = $(`<div data-board="attack" class="board-container"></div>`)
@@ -45,9 +42,8 @@ const createGameElement = function(rows, cols) {
   $defendingBoard.append(createBoardElement(rows,cols,"defend"));
   $gameContainer.append($shootingBoard).append($defendingBoard);
 
-  $gameStage.append(createStatsElement());
-  $gameStage.append($gameContainer);
-  $gameStage.append(createButtonsElement());
+  $gameStage.prepend($gameContainer);
+  $gameStage.prepend(createStatsElement());
 
   return $gameStage;
 }

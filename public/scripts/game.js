@@ -27,30 +27,14 @@ const addFireListener = function($button, boardShots) {
   });
 };
 
-
-
+const getCombatHandlers = function({ $game, rows, cols }, ships, transition) {
+  const events = [];
+  return events;
+}
 
 const startCombat = function({ $game, rows, cols }, ships, transition) {
-  
+  return getCombatHandlers();
 };
-
-const adjustForBounds = function(point, max, len) {
-  if (point < 0) {
-    return 0;
-  } else if (point + len >= max) {
-    return point - (point + len - max);
-  }
-  return point;
-}
-
-const getAdjustedPos = function(isVert, len, {row, col}, {rows, cols}) {
-  const center = Math.floor(len/2);
-  if (isVert) {
-    return adjustForBounds(row - center, rows, len)
-  } else { 
-    return adjustForBounds(col - center, cols, len)
-  }
-}
 
 const getSetUpHandlers = function({ $game, rows, cols }, ships, transition) {
   const events = [];
@@ -65,7 +49,7 @@ const getSetUpHandlers = function({ $game, rows, cols }, ships, transition) {
     }
     curShip = shipId;
   };
-  events.push({ $target: $game.find(`[data-ship-id]`), type: "click", handler: shipClickHandler});
+  events.push({ $target: $game.find(`[data-ship-id].ship`), type: "click", handler: shipClickHandler});
 
   const boardClickHandler = function(evt) {
     if (!ships[curShip]) return;
@@ -77,14 +61,22 @@ const getSetUpHandlers = function({ $game, rows, cols }, ships, transition) {
     const col = Number($target.attr(`data-col`));
     if (Number.isNaN(row) || Number.isNaN(col)) return;
     const $board = $(this);
-    $board.find(`.hover`).removeClass("hover");
     const shipStart = getAdjustedPos(isVert, ship.length, {row, col}, {rows, cols});
+    const shipTiles = [];
     for(let i = shipStart; i < shipStart + ship.length; i++) {
-      $board
-        .find(`[data-${isVert ? "row" : "col"}=${i}][data-${!isVert ? `row=${row}` : `col=${col}`}]`)
-        .addClass("selected");
+      const $tile = $board
+        .find(`[data-${isVert ? "row" : "col"}=${i}][data-${!isVert ? `row=${row}` : `col=${col}`}]`);
+      const shipId = $tile.attr('data-ship-id');
+      if (shipId !== undefined && shipId !== curShip) return;
+      shipTiles.push($tile);
     }
-
+    $board.find(`[data-ship-id="${curShip}"].tuple`).removeAttr("data-ship-id");
+    for(const $tile of shipTiles) {
+      $tile.attr("data-ship-id",curShip);
+    }
+    const start = { x: shipTiles[0].attr("data-col"), y: shipTiles[0].attr("data-row") };
+    const end = { x: shipTiles[shipTiles.length - 1].attr("data-col"), y: shipTiles[shipTiles.length - 1].attr("data-row") };
+    ships[curShip] = {...ship, start, end};
   };
   events.push({ $target: $game.find(`[data-board="defend"]`), type: "click", handler: boardClickHandler});
 
@@ -106,11 +98,17 @@ const getSetUpHandlers = function({ $game, rows, cols }, ships, transition) {
   };
   events.push({ $target: $game.find(`[data-board="defend"]`), type: "mouseover", handler: boardHoverHandler});
   
-  const boardSubmitHandler = function(evt) {
-    const $target = $(evt.target);
+  const boardOutHandler = function() {
+    $(this).find(`.hover`).removeClass("hover");
+  };
+  events.push({ $target: $game.find(`[data-board="defend"]`), type: "mouseout", handler: boardOutHandler});
+
+  const boardSubmitHandler = function() {
+    if (!areValid(ships)) return;
+    transition("START");
 
   };
-  events.push({ $target: $game.find(``), type: "click", handler: boardSubmitHandler});
+  events.push({ $target: $game.find(`[data-button-id="save"]`), type: "click", handler: boardSubmitHandler});
 
   return events;
 }
@@ -142,10 +140,10 @@ const setupPhase = function(game, ships) {
     else if(phase === CLEANUP) removeEventHandlers(events);
     else if(phase === START) {
       removeEventHandlers(events);
-      events = startCombat(game, ships, this);
+      events = startCombat(game, ships, transition);
     } else if (phase === RESTART) {
       removeEventHandlers(events);
-      events = getSetUpHandlers(game, ships, this);
+      events = getSetUpHandlers(game, ships, transition);
       transition(SETUP);
     }
   };
@@ -156,6 +154,7 @@ const createGame = function({rows, cols}) {
   const { $ships, ships } = setupShips();
   const $game = createGameElement(rows, cols);
   $game.find(`div.stats`).prepend($ships);
+  $game.find(`div.buttons`).prepend(createButton("save"));
 
   setupPhase({ $game, rows, cols }, ships);
 

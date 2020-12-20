@@ -297,6 +297,10 @@ div[data-board=defend] div.game-board div.table-body div.row div.tuple.hover {
   background-color: darkgrey;
 }
 
+div[data-board=defend] div.game-board div.table-body div.row div.tuple[data-ship-id] {
+  background-color: green;
+}
+
 div.ships {
   display: flex;
   flex-direction: row;

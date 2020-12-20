@@ -6,7 +6,6 @@ const createShip = function(id, length) {
     end: {x: null, y: null},
     hits: [],
     length,
-    isVert: true,
     isHit(coord) {
       const {x , y} = coord;
       if (x === undefined || y === undefined) return false;
