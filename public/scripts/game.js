@@ -42,7 +42,7 @@ const getCombatHandlers = function({ $game, rows, cols }, {shots, ships}, transi
 }
 
 const startCombat = function({ $game, rows, cols }, player, transition) {
-  if (player.id !== 0) {
+  if (player.type === "AI") {
     return [];
   } 
   $game.find(`.buttons`).replaceWith(createButton("fire"));
@@ -148,34 +148,54 @@ const shiftSpotlight = function($game, player) {
   $game.find(`[data-board="${player === 0 ? "attack" : "defend"}"]`).addClass(`spotlight`);
 }
 
-const setupPhase = function(game, players) {
-  const SETUP = "SETUP";
-  const CLEANUP = "CLEANUP";
-  const START = "START";
-  const RESTART = "RESTART";
-  const NEXT_TURN = "NEXT_TURN";
-  let events = [];
-  let curPlayer = 0;
-  const transition = function(phase) {
-    if (phase === SETUP) setEventHandlers(events);
-    else if(phase === CLEANUP) removeEventHandlers(events);
-    else if(phase === START) {
-      removeEventHandlers(events);
-      shiftSpotlight(game.$game, curPlayer);
-      events = startCombat(game, players[curPlayer], transition);
-      transition(SETUP);
-    } else if (phase === RESTART) {
-      removeEventHandlers(events);
-      events = getSetUpHandlers(game, players[curPlayer], transition);
-      transition(SETUP);
-    } else if (phase === NEXT_TURN) {
-      curPlayer = (curPlayer + 1) % players.length;
-      setTimeout(function() {
-        transition(START);
-      }, 1000);
-    }
+const setPhaseOpts = function(game, players, setGameData) {
+  return {
+    SETUP: function (evts) {
+      setEventHandlers(evts);
+    },
+    CLEANUP: function(evts) {
+      removeEventHandlers(evts);
+    },
+    START: function(evts, player, transition) {
+      removeEventHandlers(evts);
+      setTimeout( function() {
+        shiftSpotlight(game.$game, player);
+      }, 500);
+      setGameData(startCombat(game, players[player], transition), null);
+      transition("SETUP");
+    },
+    RESTART: function(evts, player, transition) {
+      removeEventHandlers(evts);
+      setGameData(getSetUpHandlers(game, players[player], transition), null);
+      transition("SETUP");
+    },
+    NEXT_TURN: function(evts, player, transition) {
+      setGameData(evts, (player + 1) % players.length);
+      transition("START");
+    },
+    VICTORY: function() {
+
+    },
+    DEFEAT: function() {
+
+    },
   };
-  transition(RESTART);
+}
+
+const setupPhase = function(game, players) {
+  const gameData = {
+    evts: [],
+    player: 0,
+  }
+  const setGameData = function(evts, player) {
+    gameData.evts = evts || gameData.evts;
+    gameData.player = player || gameData.player;
+  }
+  const OPTS = setPhaseOpts(game, players, setGameData);
+  const transition = function(phase) {
+    OPTS[phase](gameData.evts, gameData.player, transition);
+  };
+  transition("RESTART");
 };
 
 const createGame = function({rows, cols}, maxShots = 1) {
@@ -183,7 +203,7 @@ const createGame = function({rows, cols}, maxShots = 1) {
   const $game = createGameElement(rows, cols);
   $game.find(`div.stats`).prepend($ships);
   $game.find(`div.buttons`).prepend(createButton("save"));
-  const players = [ createPlayer(0, shipsArr[0], maxShots), createPlayer(1, shipsArr[1], maxShots) ];
+  const players = [ createPlayer(0, shipsArr[0], maxShots, "PLAYER"), createPlayer(1, shipsArr[1], maxShots, "AI") ];
   shiftSpotlight($game, 1);
 
   setupPhase({ $game, rows, cols }, players);

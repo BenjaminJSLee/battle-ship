@@ -12,7 +12,7 @@ const createMusicHandlers = function($icon, $slider, music) {
 
   const sliderHandler = function(evt) {
     music.volume = evt.target.value / 100;
-    window.localStorage.setItem('music-volume', music.volume);
+    window.localStorage.setItem('music-volume', evt.target.value);
   }
   const musicLeaveHandler = function() {
     let className = ""
