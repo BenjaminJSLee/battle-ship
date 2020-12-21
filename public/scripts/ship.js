@@ -29,27 +29,34 @@ const createShip = function(id, length) {
   };
 };
 
-const createShipElement = function(ship) {
-  const $ship = $(`<div data-ship-id="${ship.id}" class="ship"></div>`);
-  for (let i = 0; i < ship.length; i++) {
-    $ship.append(`<div class="block${i === 0 ? " start" : ""}${i === ship.length - 1 ? " end" : ""}"></div>`);
+const createShips = function(shipLens) {
+  const ships = {};
+  for (let i = 0; i < shipLens.length; i++) {
+    const ship = createShip(i + 1, shipLens[i]);
+    ships[ship.id] = ship;
+  }
+  return ships;
+};
+
+const createShipElement = function(id, len) {
+  const $ship = $(`<div data-ship-id="${id}" class="ship"></div>`);
+  for (let i = 0; i < len; i++) {
+    $ship.append(`<div class="block${i === 0 ? " start" : ""}${i === len - 1 ? " end" : ""}"></div>`);
   }
   return $ship;
 }
 
 const createShipsElement = function(shipLens) {
-  const ships = {};
   const $ships = $(`<div class="ships"></div>`);
   for (let i = 0; i < shipLens.length; i++) {
-    const ship = createShip(i + 1, shipLens[i]);
-    const $ship = createShipElement(ship);
-    ships[ship.id] = ship;
+    const $ship = createShipElement(i + 1, shipLens[i]);
     $ships.append($ship);
   }
-  return { $ships, ships };
+  return $ships;
 }
 
 const setupShips = function(shipLens = [1, 2, 3, 3, 4, 5]) {
-  const { $ships , ships } = createShipsElement(shipLens);
-  return { $ships , ships };
+  const $ships = createShipsElement(shipLens);
+  const shipsArr = [ createShips(shipLens), createShips(shipLens) ];
+  return { $ships , shipsArr };
 };

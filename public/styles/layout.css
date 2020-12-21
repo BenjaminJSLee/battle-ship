@@ -39,6 +39,7 @@ button:hover {
 
 #bg-music .volume-icon * {
   font-size: 1.5em;
+  cursor: pointer;
 }
 
 #bg-music .slider-container {
@@ -282,14 +283,14 @@ div.spotlight div.game-board div.table-body div.row div {
   border: 0.1em solid grey;
 }
 
-div.spotlight div.game-board div.table-body div.row div.selected {
-  border: 0.1em solid silver;
-  background-color: red;
-}
-
 div[data-board=attack] div.game-board div.table-body div.row div.tuple.hover {
   border: 0.1em solid black;
   background-color: darkgrey;
+}
+
+div[data-board=attack] div.game-board div.table-body div.row div.tuple.selected {
+  border: 0.1em solid silver;
+  background-color: red;
 }
 
 div[data-board=defend] div.game-board div.table-body div.row div.tuple.hover {
@@ -309,13 +310,45 @@ div.ships {
 div.ships .ship {
   display: inline-flex;
   margin: 1em;
+  background-color: red;
+  cursor: pointer;
 }
 
 div.ships .ship .block {
   display: inline-block;
   width: 10px;
   height: 10px;
+}
+
+div.ships .ship:hover {
+  background-color: skyblue;
+}
+
+div.ships .ship.selected {
+  background-color: green;
+}
+
+main.err-page {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.err {
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: white;
   background-color: red;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  margin: auto;
+}
+
+.err > * {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
 }
 
 html {

@@ -4,11 +4,18 @@ div.ships {
   .ship {
     display: inline-flex;
     margin: 1em;
+    background-color: red;
+    cursor: pointer;
     .block {
       display: inline-block;
       width: 10px;
       height: 10px;
-      background-color: red;
+    }
+    &:hover {
+      background-color: skyblue;
+    }
+    &.selected {
+      background-color: green;
     }
   }
 }

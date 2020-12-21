@@ -7,11 +7,12 @@ const setPlayingState = function() {
   }
 };
 
-const createMusicHandlers = function($music, $icon, $slider, music) {
+const createMusicHandlers = function($icon, $slider, music) {
   const isPlaying = setPlayingState();
 
   const sliderHandler = function(evt) {
     music.volume = evt.target.value / 100;
+    window.localStorage.setItem('music-volume', music.volume);
   }
   const musicLeaveHandler = function() {
     let className = ""
@@ -48,7 +49,7 @@ const addMusicListeners = function($music, $icon, $slider, music) {
     musicEnterHandler, 
     iconClickHandler,
     togglePlayHandler, 
-  } = createMusicHandlers($music, $icon, $slider, music);
+  } = createMusicHandlers($icon, $slider, music);
   $slider.on('input', sliderHandler);
   $music.on("mouseleave", musicLeaveHandler);
   $music.on("mouseenter", musicEnterHandler);
@@ -57,12 +58,12 @@ const addMusicListeners = function($music, $icon, $slider, music) {
   music.addEventListener('play', togglePlayHandler);
 }
 
-const createPlayer = function(music) {
+const createMusicController = function(music) {
   const $musicContainer = $(`<div id="bg-music"></div>`);
   const $iconContainer = $(`<span class="volume-icon"></span>`);
   const $sliderContainer = $(`<div class="slider-container"></div>`);
   const $icon = $(`<i class="fas fa-music"></i>`);
-  const $slider = $(`<input type="range" min="0" max="100" value="25" id="bg-music-slider" />`);
+  const $slider = $(`<input type="range" min="0" max="100" value="${window.localStorage.getItem('music-volume') || 25}" id="bg-music-slider" />`);
 
   music.volume = $slider.val() / 100;
 
@@ -82,5 +83,5 @@ const createMusicPlayer = function(filename) {
     music.src = newFile || filename;
     if (play) music.play();
   }
-  return { $player: createPlayer(music), changeMusic };
+  return { $player: createMusicController(music), changeMusic };
 };

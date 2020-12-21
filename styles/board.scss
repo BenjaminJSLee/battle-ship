@@ -45,16 +45,16 @@ div.game-board {
 
 div.spotlight div.game-board div.table-body div.row div {
   border: 0.1em solid grey;
-  &.selected {
-    border: 0.1em solid silver;
-    background-color: red;
-  }
 }
 
 div[data-board=attack] div.game-board div.table-body div.row div.tuple {
   &.hover {
     border: 0.1em solid black;
     background-color: darkgrey;
+  }
+  &.selected {
+    border: 0.1em solid silver;
+    background-color: red;
   }
 }
 
