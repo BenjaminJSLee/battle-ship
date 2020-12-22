@@ -28,7 +28,6 @@ const getCombatHandlers = function({ $game, rows, cols }, {shots, ships}, transi
   const fireHandler = function() {
     if (coord.x === null || coord.y === null || shots[`${coord.x}-${coord.y}`]) return;
     shots[`${coord.x}-${coord.y}`] = true;
-    console.log(shots);
     numShots += 1;
     if (numShots >= shots.max) {
       $game.find(`[data-board="attack"] .selected, [data-board="attack"] .hover`).removeClass("selected").removeClass("hover");
@@ -127,8 +126,12 @@ const getSetUpHandlers = function({ $game, rows, cols }, {ships}, transition) {
   return events;
 }
 
-const getGameHandlers = function({ $game, rows, cols }, ships, transition) {
-
+const setUpGame = function(game, player, transition) {
+  if (player.type === "AI") {
+    return [];
+  } else if (player.type === "LOCAL") {
+    return getSetUpHandlers(game, player, transition);
+  }
 }
 
 const setEventHandlers = function(events) {
@@ -160,9 +163,9 @@ const setPhaseOpts = function(game, players, setGameData) {
       removeEventHandlers(evts);
       setTimeout( function() {
         shiftSpotlight(game.$game, player);
+        setGameData(startCombat(game, players[player], transition), null);
+        transition("SETUP");
       }, 500);
-      setGameData(startCombat(game, players[player], transition), null);
-      transition("SETUP");
     },
     RESTART: function(evts, player, transition) {
       removeEventHandlers(evts);
@@ -203,7 +206,7 @@ const createGame = function({rows, cols}, maxShots = 1) {
   const $game = createGameElement(rows, cols);
   $game.find(`div.stats`).prepend($ships);
   $game.find(`div.buttons`).prepend(createButton("save"));
-  const players = [ createPlayer(0, shipsArr[0], maxShots, "PLAYER"), createPlayer(1, shipsArr[1], maxShots, "AI") ];
+  const players = [ createPlayer(0, shipsArr[0], maxShots, "LOCAL"), createPlayer(1, shipsArr[1], maxShots, "AI") ];
   shiftSpotlight($game, 1);
 
   setupPhase({ $game, rows, cols }, players);

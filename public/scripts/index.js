@@ -9,7 +9,7 @@ $( function() {
   $("#vs-ai").on('click', function() {
     $('main').empty();
     changeMusic(`/sounds/sea-shanty.mp3`, true);
-    $('main').append(createGame({rows: 15, cols: 15}));
+    $('main').append(createGame({rows: 10, cols: 10}));
   });
 
   $(".dropdown").on('click', function() {
