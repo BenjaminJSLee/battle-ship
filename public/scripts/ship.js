@@ -55,7 +55,7 @@ const createShipsElement = function(shipLens) {
   return $ships;
 }
 
-const setupShips = function(shipLens = [ 2, 3, 3, 4, 5]) {
+const setupShips = function(shipLens = [ 2, 3, 3, 4, 5 ]) {
   const $ships = createShipsElement(shipLens);
   const shipsArr = [ createShips(shipLens), createShips(shipLens) ];
   return { $ships , shipsArr };

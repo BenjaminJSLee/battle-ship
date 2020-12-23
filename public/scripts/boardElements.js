@@ -16,7 +16,7 @@ const createButton = function(action, txt = null) {
 
 const createBoardElement = function(rows, cols, id) {
   const $board = $(`
-    <div data-id="board-${id}" class="game-board">
+    <div data-board="${id}" class="game-board">
     </div>
   `);
   const $table = $(`<div class="table-body"></div>`);
@@ -38,15 +38,14 @@ const createBoardElement = function(rows, cols, id) {
   return $board.append($table);
 };
 
-const createGameElement = function(rows, cols) {
+const createGameElement = function(rows, cols, players) {
   const $gameStage = $(`<section id="stage"><div class="buttons"></div></section>`);
 
   const $gameContainer = $(`<div class="game-container"></div>`);
-  const $shootingBoard = $(`<div data-board="attack" class="board-container"></div>`)
-  $shootingBoard.append(createBoardElement(rows,cols,"shoot"));
-  const $defendingBoard = $(`<div data-board="defend" class="board-container"></div>`)
-  $defendingBoard.append(createBoardElement(rows,cols,"defend"));
-  $gameContainer.append($shootingBoard).append($defendingBoard);
+  for (let i = 0; i < players; i++) {
+    const $boardContainer = $(`<div class="board-container"></div>`).append(createBoardElement(rows,cols,i));
+    $gameContainer.append($boardContainer);
+  }
 
   $gameStage.prepend($gameContainer);
   $gameStage.prepend(createStatsElement());

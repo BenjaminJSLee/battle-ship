@@ -1,5 +1,5 @@
 
-const getCombatHandlers = function({ $game, rows, cols }, {shots, ships}, transition) {
+const getCombatHandlers = function({ $game, rows, cols }, {id, shots, ships}, transition) {
   const events = [];
   const coord = { x: null, y: null };
   let numShots = 0;
@@ -13,7 +13,7 @@ const getCombatHandlers = function({ $game, rows, cols }, {shots, ships}, transi
     coord.x = col;
     coord.y = row;
   };
-  events.push({ $target: $game.find(`[data-board="attack"]`), type: "click", handler: boardClickHandler});
+  events.push({ $target: $game.find(`[data-board][data-board!="${id}"]`), type: "click", handler: boardClickHandler});
 
   const boardHoverHandler = function(evt) {
     const $target = $(evt.target);
@@ -23,14 +23,19 @@ const getCombatHandlers = function({ $game, rows, cols }, {shots, ships}, transi
     $(this).find(`.tuple.hover`).removeClass(`hover`);
     $target.addClass(`hover`);
   };
-  events.push({ $target: $game.find(`[data-board="attack"]`), type: "mouseover", handler: boardHoverHandler});
+  events.push({ $target: $game.find(`[data-board][data-board!="${id}"]`), type: "mouseover", handler: boardHoverHandler});
   
+  const boardOutHandler = function() {
+    $(this).find(`.hover`).removeClass("hover");
+  };
+  events.push({ $target: $game.find(`[data-board][data-board!="${id}"]`), type: "mouseout", handler: boardOutHandler});
+
   const fireHandler = function() {
     if (coord.x === null || coord.y === null || shots[`${coord.x}-${coord.y}`]) return;
     shots[`${coord.x}-${coord.y}`] = true;
     numShots += 1;
     if (numShots >= shots.max) {
-      $game.find(`[data-board="attack"] .selected, [data-board="attack"] .hover`).removeClass("selected").removeClass("hover");
+      $game.find(`[data-board][data-board!="${id}"] .selected, [data-board][data-board!="${id}"] .hover`).removeClass("selected").removeClass("hover");
       transition("NEXT_TURN");
     }
   };
@@ -48,7 +53,7 @@ const startCombat = function({ $game, rows, cols }, player, transition) {
   return getCombatHandlers({ $game, rows, cols }, player, transition);
 };
 
-const getSetUpHandlers = function({ $game, rows, cols }, {ships}, transition) {
+const getSetUpHandlers = function({ $game, rows, cols }, {id, ships}, transition) {
   const events = [];
   let curShip = null;
   let isVert = true;
@@ -92,7 +97,7 @@ const getSetUpHandlers = function({ $game, rows, cols }, {ships}, transition) {
     const end = { x: shipTiles[shipTiles.length - 1].attr("data-col"), y: shipTiles[shipTiles.length - 1].attr("data-row") };
     ships[curShip] = {...ship, start, end};
   };
-  events.push({ $target: $game.find(`[data-board="defend"]`), type: "click", handler: boardClickHandler});
+  events.push({ $target: $game.find(`[data-board][data-board="${id}"]`), type: "click", handler: boardClickHandler});
 
   const boardHoverHandler = function(evt) {
     if (!ships[curShip]) return;
@@ -110,16 +115,16 @@ const getSetUpHandlers = function({ $game, rows, cols }, {ships}, transition) {
         .addClass("hover");
     }
   };
-  events.push({ $target: $game.find(`[data-board="defend"]`), type: "mouseover", handler: boardHoverHandler});
+  events.push({ $target: $game.find(`[data-board][data-board="${id}"]`), type: "mouseover", handler: boardHoverHandler});
   
   const boardOutHandler = function() {
     $(this).find(`.hover`).removeClass("hover");
   };
-  events.push({ $target: $game.find(`[data-board="defend"]`), type: "mouseout", handler: boardOutHandler});
+  events.push({ $target: $game.find(`[data-board][data-board="${id}"]`), type: "mouseout", handler: boardOutHandler});
 
   const boardSubmitHandler = function() {
     if (!areValid(ships)) return $(this).parent().parent().append(createError("All ships must be added before starting"));
-    transition("START");
+    transition("NEXT_SETUP");
   };
   events.push({ $target: $game.find(`[data-button-id="save"]`), type: "click", handler: boardSubmitHandler});
 
@@ -147,34 +152,37 @@ const removeEventHandlers = function(events) {
 }
 
 const shiftSpotlight = function($game, player) {
-  $game.find(`[data-board="${player === 0 ? "defend" : "attack"}"]`).removeClass(`spotlight`);
-  $game.find(`[data-board="${player === 0 ? "attack" : "defend"}"]`).addClass(`spotlight`);
+  $game.find(`[data-board][data-board!="${player}"]`).parent().removeClass(`spotlight`);
+  $game.find(`[data-board][data-board="${player}"]`).parent().addClass(`spotlight`);
 }
 
 const setPhaseOpts = function(game, players, setGameData) {
   return {
-    SETUP: function (evts) {
-      setEventHandlers(evts);
-    },
-    CLEANUP: function(evts) {
-      removeEventHandlers(evts);
-    },
     START: function(evts, player, transition) {
       removeEventHandlers(evts);
-      setTimeout( function() {
-        shiftSpotlight(game.$game, player);
-        setGameData(startCombat(game, players[player], transition), null);
-        transition("SETUP");
-      }, 500);
+      const newEvts = startCombat(game, players[player], transition);
+      setGameData(newEvts, null);
+      setEventHandlers(newEvts);
     },
-    RESTART: function(evts, player, transition) {
+    SETUP: function(evts, player, transition) {
       removeEventHandlers(evts);
-      setGameData(getSetUpHandlers(game, players[player], transition), null);
-      transition("SETUP");
+      const newEvts = getSetUpHandlers(game, players[player], transition);
+      setGameData(newEvts, null);
+      setEventHandlers(newEvts);
     },
     NEXT_TURN: function(evts, player, transition) {
       setGameData(evts, (player + 1) % players.length);
-      transition("START");
+      setTimeout(function() {
+        shiftSpotlight(game.$game, player);
+        transition("START");
+      }, 500);
+    },
+    NEXT_SETUP: function(evts, player, transition) {
+      const nextPlayer = (player + 1) % players.length;
+      shiftSpotlight(game.$game, nextPlayer);
+      if (nextPlayer === 0) return transition("START");
+      setGameData(evts, nextPlayer);
+      transition("SETUP");
     },
     VICTORY: function() {
 
@@ -192,22 +200,22 @@ const setupPhase = function(game, players) {
   }
   const setGameData = function(evts, player) {
     gameData.evts = evts || gameData.evts;
-    gameData.player = player || gameData.player;
+    gameData.player = player === null ? gameData.player : player;
   }
   const OPTS = setPhaseOpts(game, players, setGameData);
   const transition = function(phase) {
     OPTS[phase](gameData.evts, gameData.player, transition);
   };
-  transition("RESTART");
+  transition("SETUP");
 };
 
 const createGame = function({rows, cols}, maxShots = 1) {
   const { $ships, shipsArr } = setupShips([2]);
-  const $game = createGameElement(rows, cols);
+  const $game = createGameElement(rows, cols, 2);
   $game.find(`div.stats`).prepend($ships);
   $game.find(`div.buttons`).prepend(createButton("save"));
-  const players = [ createPlayer(0, shipsArr[0], maxShots, "LOCAL"), createPlayer(1, shipsArr[1], maxShots, "AI") ];
-  shiftSpotlight($game, 1);
+  const players = [ createPlayer(0, shipsArr[0], maxShots, "LOCAL"), createPlayer(1, shipsArr[1], maxShots, "LOCAL") ];
+  shiftSpotlight($game, 0);
 
   setupPhase({ $game, rows, cols }, players);
 
