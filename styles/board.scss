@@ -42,31 +42,48 @@ div.game-board {
         height: 100%;
         border: 0.05em solid grey;
         background-color: white;
-  
-        &.selected {
-          border: 0.05em solid silver;
-          background-color: red;
-        }
-  
       }
     }
   }
 }
 
-div.spotlight div.game-board div.table-body div.tuple {
-  border: 0.1em solid grey;
-  &.hover {
-    border: 0.1em solid black;
-    background-color: darkgrey;
+div.spotlight div.game-board div.table-body {
+  
+  div.row > * {
+    border: 0.1em solid grey;
+    &.tuple {
+      &.hover {
+        border: 0.1em solid black;
+        background-color: darkgrey;
+      }
+      &.selected {
+        border: 0.1em solid rgb(255, 118, 118);
+        background-color: red;
+      }
+    }
   }
 }
 
 div[data-board].game-board div.table-body div.row div.tuple {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   &[data-ship-id] {
     background-color: green;
   }
-  &.selected {
-    border: 0.1em solid rgb(255, 118, 118);
-    background-color: red;
+  div.missile {
+    display: inline-flex;
+    height: 70%;
+    margin-left: 15%;
+    margin-right: 15%;
+    border-radius: 100%;
+    &.hit {
+      border-color: green;
+      background-color: red;
+    }
+    &.miss {
+      border-color: black;
+      background-color: white;
+    }
   }
 }

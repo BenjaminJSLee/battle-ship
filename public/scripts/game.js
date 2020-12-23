@@ -34,8 +34,10 @@ const getCombatHandlers = function({ $game, rows, cols }, {id, shots, ships}, tr
     if (coord.x === null || coord.y === null || shots[`${coord.x}-${coord.y}`]) return;
     shots[`${coord.x}-${coord.y}`] = true;
     numShots += 1;
+    const $tuple = $game.find(`[data-board][data-board!="${id}"] .selected`).removeClass("selected");
+    $tuple.append($(`<div class="missile ${shots[`${coord.x}-${coord.y}`] ? "hit" : "miss"}"></div>`));
     if (numShots >= shots.max) {
-      $game.find(`[data-board][data-board!="${id}"] .selected, [data-board][data-board!="${id}"] .hover`).removeClass("selected").removeClass("hover");
+      $game.find(`[data-board][data-board!="${id}"] .hover`).removeClass("hover");
       transition("NEXT_TURN");
     }
   };
