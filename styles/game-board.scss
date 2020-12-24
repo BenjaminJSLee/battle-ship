@@ -17,6 +17,8 @@
     align-items: center;
     .board-container {
       animation: board-shrink 1s ease-in-out 0s;
+      min-width: 280px;
+      min-height: 280px;
       width: 40%;
       height: 66.666%;
       background-color: steelblue;

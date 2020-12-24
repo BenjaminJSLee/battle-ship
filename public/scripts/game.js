@@ -1,7 +1,7 @@
 
 const getCombatHandlers = function({ $game, rows, cols }, {id, shots, ships}, transition) {
   const events = [];
-  const coord = { x: null, y: null };
+  const coord = { board: null, x: null, y: null };
   let numShots = 0;
   const boardClickHandler = function(evt) {
     const $target = $(evt.target);
@@ -12,6 +12,7 @@ const getCombatHandlers = function({ $game, rows, cols }, {id, shots, ships}, tr
     $target.addClass(`selected`);
     coord.x = col;
     coord.y = row;
+    coord.board = $(this).attr("data-board");
   };
   events.push({ $target: $game.find(`[data-board][data-board!="${id}"]`), type: "click", handler: boardClickHandler});
 
@@ -31,8 +32,8 @@ const getCombatHandlers = function({ $game, rows, cols }, {id, shots, ships}, tr
   events.push({ $target: $game.find(`[data-board][data-board!="${id}"]`), type: "mouseout", handler: boardOutHandler});
 
   const fireHandler = function() {
-    if (coord.x === null || coord.y === null || shots[`${coord.x}-${coord.y}`]) return;
-    shots[`${coord.x}-${coord.y}`] = true;
+    if (coord.x === null || coord.y === null || shots[`${coord.x}-${coord.y}`] !== undefined) return;
+    shots[`${coord.x}-${coord.y}`] = false;
     numShots += 1;
     const $tuple = $game.find(`[data-board][data-board!="${id}"] .selected`).removeClass("selected");
     $tuple.append($(`<div class="missile ${shots[`${coord.x}-${coord.y}`] ? "hit" : "miss"}"></div>`));
@@ -59,6 +60,12 @@ const getSetUpHandlers = function({ $game, rows, cols }, {id, ships}, transition
   const events = [];
   let curShip = null;
   let isVert = true;
+
+  const rotateHandler = function() {
+    isVert = !isVert;
+  }
+  events.push({ $target: $game.find(`[data-button-id="rotate"]`), type: "click", handler: rotateHandler});
+
   const shipClickHandler = function(evt) {
     const $target = $(this);
     const shipId = $target.attr(`data-ship-id`);
@@ -212,7 +219,7 @@ const setupPhase = function(game, players) {
 };
 
 const createGame = function({rows, cols}, maxShots = 1) {
-  const { $ships, shipsArr } = setupShips([2]);
+  const { $ships, shipsArr } = setupShips();
   const $game = createGameElement(rows, cols, 2);
   $game.find(`div.stats`).prepend($ships);
   $game.find(`div.buttons`).prepend(createButton("save"));

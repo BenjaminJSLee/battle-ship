@@ -2,4 +2,11 @@
   .stats {
     background-color: #FFFFFF;
   }
+  .rotate {
+    display: inline-flex;
+    background-color: orange;
+    border-radius: 0.25em;
+    padding: 0.5em;
+    cursor: pointer;
+  }
 }

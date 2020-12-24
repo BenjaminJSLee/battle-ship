@@ -5,6 +5,9 @@ const createStatsElement = function() {
         <div class="hits">Hits: <span>0</span></div>
         <div class="misses">Misses: <span>0</span></div>
       </div>
+      <div data-button-id="rotate" class="rotate">
+        <i class="fas fa-sync-alt"></i>
+      </div>
     </div> 
   `);
   return $stats;

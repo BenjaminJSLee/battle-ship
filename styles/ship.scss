@@ -6,10 +6,11 @@ div.ships {
     margin: 1em;
     background-color: red;
     cursor: pointer;
+    border-radius: 50% 100% 100% 50%;
     .block {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
+      display: inline-flex;
+      width: 35px;
+      height: 35px;
     }
     &:hover {
       background-color: skyblue;
