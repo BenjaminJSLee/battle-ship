@@ -2,6 +2,7 @@
   .stats {
     display: flex;
     flex-direction: row;
+    align-items: center;
     height: 100px;
     background-color: #FFFFFF;
     .buttons {
@@ -17,6 +18,7 @@
       padding: 0.4em;
       margin: 0.5em;
       width: 40%;
+      height: 80%;
       overflow-y: auto;
       .message {
         margin: 0.2em;

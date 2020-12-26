@@ -6,17 +6,25 @@ div.ships {
   max-width: 47.5%;
   overflow-y: auto;
   .ship {
-    display: inline-flex;
-    margin: auto;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+    display: flex;
+    height: auto;
+    margin: 0.2em;
     background-color: red;
     cursor: pointer;
     border-radius: 50% 100% 100% 50%;
+    overflow: hidden;
     .block {
       display: inline-flex;
       width: 35px;
       height: 35px;
+      border-left: 1px solid black;
+      border-right: 1px solid black;
+      &.end {
+        border-right: none;
+      }
+      &.start {
+        border-left: none;
+      }
     }
     &:hover {
       background-color: skyblue;

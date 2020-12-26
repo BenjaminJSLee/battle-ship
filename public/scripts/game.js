@@ -1,18 +1,27 @@
 
-const toggleShipsView = function($game, player) {
-  const $board = $game.find(`[data-board=${player.id}]`);
-  const $ships = $board.find(`[data-ship-id]`);
+const toggleShipsView = function($game, player = null, shipId = null) {
+  const $board = $game.find(`[data-board${ player ? `=${player.id}` : "" }]`);
+  const $ships = $board.find(`[data-ship-id${shipId ? `=${shipId}` : "" }]`);
   if ($ships.length !== 0) {
-    $ships.removeAttr("data-ship-id");
+    $ships.removeClass("start").removeClass("end");
+    $ships.removeAttr("data-ship-id").removeAttr("data-vertical");
+    return;
+  } else if (!player) {
     return;
   }
-  const ships = player.ships;
+  const ships = shipId ? { [shipId]: player.ships[shipId] } : player.ships;
   for (const id in ships) {
     const { start, end } = ships[id];
     const isVert = start.x === end.x;
-    for (let i = Number(isVert ? start.y : start.x) ; i <= Number(isVert ? end.y : end.x); i++) {
+    const startInd =  Number(isVert ? start.y : start.x);
+    const endInd = Number(isVert ? end.y : end.x);
+    if (Number.isNaN(startInd) || Number.isNaN(endInd)) return;
+    for (let i = startInd; i <= endInd; i++) {
       const $tuple = $board.find(`[data-${isVert ? "row" : "col"}=${i}][data-${!isVert ? `row=${start.y}` : `col=${start.x}`}]`);
       $tuple.attr("data-ship-id",`${id}`);
+      if (isVert) $tuple.attr("data-vertical", "");
+      if (i === startInd) $tuple.addClass("start");
+      if (i === endInd) $tuple.addClass("end");
     }
   }
 }
@@ -99,7 +108,7 @@ const startCombat = function(game, player, players, transition) {
   if (players[player].type === "AI") {
     return [];
   } else if (players[player].type === "LOCAL") {
-    game.$game.find(`[data-board] [data-ship-id]`).removeAttr("data-ship-id");
+    toggleShipsView(game.$game);
     return getCombatHandlers(game, player, players, transition);
   }
 };
@@ -149,9 +158,10 @@ const getSetUpHandlers = function({ $game, rows, cols }, {id, ships}, transition
       if (shipId !== undefined && shipId !== curShip) return;
       shipTiles.push($tile);
     }
-    $board.find(`[data-ship-id="${curShip}"].tuple`).removeAttr("data-ship-id");
+    $board.find(`[data-ship-id="${curShip}"].tuple`).removeAttr("data-ship-id").removeAttr("data-vertical");
     for(const $tile of shipTiles) {
       $tile.attr("data-ship-id",curShip);
+      if (isVert) $tile.attr("data-vertical", "");
     }
     $game.find(`.stats [data-ship-id=${curShip}]`).addClass(`placed`);
     const start = { x: shipTiles[0].attr("data-col"), y: shipTiles[0].attr("data-row") };
@@ -196,7 +206,7 @@ const setUpGame = function(game, player, transition) {
   if (player.type === "AI") {
     return [];
   } else if (player.type === "LOCAL") {
-    game.$game.find(`[data-board] [data-ship-id]`).removeAttr("data-ship-id");
+    toggleShipsView(game.$game);
     return getSetUpHandlers(game, player, transition);
   }
 }
@@ -278,7 +288,7 @@ const setupPhase = function(game, players) {
 };
 
 const createGame = function({rows, cols}, maxShots = 1) {
-  const { $ships, shipsArr } = setupShips();
+  const { $ships, shipsArr } = setupShips([2]);
   const $game = createGameElement(rows, cols, 2);
   $game.find(`div.stats`).prepend($ships);
   const players = [ createPlayer(0, shipsArr[0], maxShots, "LOCAL"), createPlayer(1, shipsArr[1], maxShots, "LOCAL") ];

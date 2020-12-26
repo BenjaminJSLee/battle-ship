@@ -238,6 +238,7 @@ button:hover {
 #stage .stats {
   display: flex;
   flex-direction: row;
+  align-items: center;
   height: 100px;
   background-color: #FFFFFF;
 }
@@ -256,6 +257,7 @@ button:hover {
   padding: 0.4em;
   margin: 0.5em;
   width: 40%;
+  height: 80%;
   overflow-y: auto;
 }
 
@@ -342,6 +344,35 @@ div[data-board].game-board div.table-body div.row div.tuple {
 
 div[data-board].game-board div.table-body div.row div.tuple[data-ship-id] {
   background-color: green;
+  border-color: black;
+  border-style: solid none solid none;
+}
+
+div[data-board].game-board div.table-body div.row div.tuple[data-ship-id]:not([data-vertical]) {
+  padding-left: 0.05em;
+  padding-right: 0.05em;
+}
+
+div[data-board].game-board div.table-body div.row div.tuple[data-ship-id]:not([data-vertical]).start {
+  padding-left: 0em;
+  border-left: 0.1em solid;
+}
+
+div[data-board].game-board div.table-body div.row div.tuple[data-ship-id]:not([data-vertical]).end {
+  padding-right: 0em;
+  border-right: 0.1em solid;
+}
+
+div[data-board].game-board div.table-body div.row div.tuple[data-ship-id][data-vertical] {
+  border-style: none solid none solid;
+}
+
+div[data-board].game-board div.table-body div.row div.tuple[data-ship-id][data-vertical].start {
+  border-top: 0.1em solid;
+}
+
+div[data-board].game-board div.table-body div.row div.tuple[data-ship-id][data-vertical].end {
+  border-bottom: 0.1em solid;
 }
 
 div[data-board].game-board div.table-body div.row div.tuple div.missile {
@@ -372,19 +403,29 @@ div.ships {
 }
 
 div.ships .ship {
-  display: inline-flex;
-  margin: auto;
-  margin-left: 0.5em;
-  margin-right: 0.5em;
+  display: flex;
+  height: auto;
+  margin: 0.2em;
   background-color: red;
   cursor: pointer;
   border-radius: 50% 100% 100% 50%;
+  overflow: hidden;
 }
 
 div.ships .ship .block {
   display: inline-flex;
   width: 35px;
   height: 35px;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+}
+
+div.ships .ship .block.end {
+  border-right: none;
+}
+
+div.ships .ship .block.start {
+  border-left: none;
 }
 
 div.ships .ship:hover {

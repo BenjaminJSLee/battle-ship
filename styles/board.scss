@@ -70,6 +70,29 @@ div[data-board].game-board div.table-body div.row div.tuple {
   align-items: center;
   &[data-ship-id] {
     background-color: green;
+    border-color: black;
+    border-style: solid none solid none;
+    &:not([data-vertical]) {
+      padding-left: 0.05em;
+      padding-right: 0.05em;
+      &.start {
+        padding-left: 0em;
+        border-left: 0.1em solid;
+      }
+      &.end {
+        padding-right: 0em;
+        border-right: 0.1em solid;
+      }
+    }
+    &[data-vertical] {
+      border-style: none solid none solid;
+      &.start {
+        border-top: 0.1em solid;
+      }
+      &.end {
+        border-bottom: 0.1em solid;
+      }
+    }
   }
   div.missile {
     display: inline-flex;
