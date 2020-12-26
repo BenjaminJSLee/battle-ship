@@ -83,7 +83,7 @@ const getCombatHandlers = function({ $game, rows, cols }, player, players, trans
     shots.total += 1;
     numShots += 1;
     const $tuple = $game.find(`[data-board][data-board!="${player}"] .selected`).removeClass("selected");
-    $tuple.append($(`<div class="missile ${shotType !== "miss" ? "hit" : "miss"}"></div>`));
+    $tuple.append($(`<div class="missile ${shotType !== "MISS" ? "hit" : "miss"}"></div>`));
     if (numShots >= shots.max) {
       $game.find(`[data-board][data-board!="${player}"] .hover`).removeClass("hover");
       transition("NEXT_TURN");
