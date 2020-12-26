@@ -1,9 +1,15 @@
 div.ships {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0.5em;
+  max-width: 47.5%;
+  overflow-y: auto;
   .ship {
     display: inline-flex;
-    margin: 1em;
+    margin: auto;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
     background-color: red;
     cursor: pointer;
     border-radius: 50% 100% 100% 50%;

@@ -1,4 +1,7 @@
 button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   outline: none;
   width: 100%;
   height: 100%;
@@ -9,6 +12,12 @@ button {
   background-color: blue;
   box-shadow: 0.15em 0.15em 0.6em 0.15em blue;
   cursor: pointer;
+}
+
+button.rotate {
+  display: inline-flex;
+  background-color: orange;
+  border-radius: 0.25em;
 }
 
 button:hover {
@@ -233,17 +242,25 @@ button:hover {
   background-color: #FFFFFF;
 }
 
-#stage .stats .rotate {
-  display: inline-flex;
-  background-color: orange;
-  border-radius: 0.25em;
-  padding: 0.5em;
-  cursor: pointer;
+#stage .stats .buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  margin: 0.5em;
+  width: 12.5%;
 }
 
 #stage .stats .log {
-  height: 100%;
-  overflow-y: scroll;
+  text-align: left;
+  padding: 0.4em;
+  margin: 0.5em;
+  width: 40%;
+  overflow-y: auto;
+}
+
+#stage .stats .log .message {
+  margin: 0.2em;
 }
 
 div.game-board {
@@ -348,11 +365,17 @@ div[data-board].game-board div.table-body div.row div.tuple div.missile.miss {
 div.ships {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0.5em;
+  max-width: 47.5%;
+  overflow-y: auto;
 }
 
 div.ships .ship {
   display: inline-flex;
-  margin: 1em;
+  margin: auto;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
   background-color: red;
   cursor: pointer;
   border-radius: 50% 100% 100% 50%;
@@ -388,6 +411,7 @@ main.err-page {
   padding: 0.2rem;
   border-radius: 0.5rem;
   margin: auto;
+  cursor: pointer;
 }
 
 .err > * {

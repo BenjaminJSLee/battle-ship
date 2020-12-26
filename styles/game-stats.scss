@@ -4,16 +4,23 @@
     flex-direction: row;
     height: 100px;
     background-color: #FFFFFF;
-    .rotate {
-      display: inline-flex;
-      background-color: orange;
-      border-radius: 0.25em;
-      padding: 0.5em;
-      cursor: pointer;
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
+      align-items: stretch;
+      margin: 0.5em;
+      width: 12.5%;
     }
     .log {
-      height: 100%;
-      overflow-y: scroll;
+      text-align: left;
+      padding: 0.4em;
+      margin: 0.5em;
+      width: 40%;
+      overflow-y: auto;
+      .message {
+        margin: 0.2em;
+      }
     }
   }
 }

@@ -1,15 +1,14 @@
-const createLog = function() {
-  const $log = $(`
-    <div data-id="log" class="log">
-    </div>
-  `);
-  return $log;
-};
-
 const addLogMsg = function($target, msg) {
   $target.append(`
     <div class="message">${msg}</div>
   `);
+  $target.scrollTop($target[0].scrollHeight);
+};
+
+const createLog = function(msg = "Welcome to battleship!") {
+  const $log = $(`<div data-id="log" class="log"></div>`);
+  addLogMsg($log, msg);
+  return $log;
 };
 
 const createButton = function(action, txt = null) {
@@ -21,15 +20,8 @@ const createStatsElement = function() {
   const $rotate = createButton("rotate", `<i class="fas fa-sync-alt"></i>`);
   const $save = createButton("save");
   const $buttons = $(`<div class="buttons"></div>`).append($rotate, $save);
-  const $stats = $(`
-    <div class="stats">
-      <div class="shots">
-        <div class="hits">Hits: <span>0</span></div>
-        <div class="misses">Misses: <span>0</span></div>
-      </div>
-    </div> 
-  `);
-  $stats.prepend($buttons).append($log);
+  const $stats = $(`<div class="stats"></div>`);
+  $stats.append($log, $buttons);
   return $stats;
 }
 

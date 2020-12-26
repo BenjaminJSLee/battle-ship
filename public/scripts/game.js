@@ -29,10 +29,10 @@ const checkShot = function({ x, y }, ships) {
   for (const id in ships) {
     let ship = ships[id];
     if (ship.isHit({x, y})) {
-      return ship.isSunk() ? `${ship.name} hit and sunk!` : "hit";
+      return ship.isSunk() ? `${ship.name} HIT and SUNK!` : "HIT";
     }
   }
-  return "miss";
+  return "MISS";
 };
 
 const getCombatHandlers = function({ $game, rows, cols }, player, players, transition) {
@@ -184,7 +184,7 @@ const getSetUpHandlers = function({ $game, rows, cols }, {id, ships}, transition
   events.push({ $target: $game.find(`[data-board][data-board="${id}"]`), type: "mouseout", handler: boardOutHandler});
 
   const boardSubmitHandler = function() {
-    if (!areValid(ships)) return $(this).parent().parent().append(createError("All ships must be added before starting"));
+    if (!areValid(ships)) return $game.find(`[data-id="log"]`).append(createError("All ships must be added before starting"));
     transition("NEXT_SETUP");
   };
   events.push({ $target: $game.find(`[data-button-id="save"]`), type: "click", handler: boardSubmitHandler});
@@ -243,7 +243,7 @@ const setPhaseOpts = function(game, players, setGameData) {
       const nextPlayer = (player + 1) % players.length;
       shiftSpotlight(game.$game, nextPlayer);
       if (nextPlayer === 0) {
-        game.$game.find(`.buttons`).replaceWith(
+        game.$game.find(`.buttons`).empty().append(
           createButton("fire"),
           createButton("toggle-visible", "Show/hide ships")
         );
@@ -278,7 +278,7 @@ const setupPhase = function(game, players) {
 };
 
 const createGame = function({rows, cols}, maxShots = 1) {
-  const { $ships, shipsArr } = setupShips([2]);
+  const { $ships, shipsArr } = setupShips();
   const $game = createGameElement(rows, cols, 2);
   $game.find(`div.stats`).prepend($ships);
   const players = [ createPlayer(0, shipsArr[0], maxShots, "LOCAL"), createPlayer(1, shipsArr[1], maxShots, "LOCAL") ];
