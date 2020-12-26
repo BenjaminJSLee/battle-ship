@@ -1,12 +1,19 @@
 #stage {
   .stats {
+    display: flex;
+    flex-direction: row;
+    height: 100px;
     background-color: #FFFFFF;
-  }
-  .rotate {
-    display: inline-flex;
-    background-color: orange;
-    border-radius: 0.25em;
-    padding: 0.5em;
-    cursor: pointer;
+    .rotate {
+      display: inline-flex;
+      background-color: orange;
+      border-radius: 0.25em;
+      padding: 0.5em;
+      cursor: pointer;
+    }
+    .log {
+      height: 100%;
+      overflow-y: scroll;
+    }
   }
 }

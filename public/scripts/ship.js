@@ -1,7 +1,8 @@
 
-const createShip = function(id, length) {
+const createShip = function(id, name, length) {
   return {
     id,
+    name: name || `Ship_${id}`,
     start: {x: null, y: null},
     end: {x: null, y: null},
     hits: [],
@@ -31,8 +32,15 @@ const createShip = function(id, length) {
 
 const createShips = function(shipLens) {
   const ships = {};
+  const shipNames = {
+    "Destroyer": 2, 
+    "Cruiser": 3, 
+    "Submarine": 3, 
+    "Battleship": 4, 
+    "Carrier": 5, 
+  };
   for (let i = 0; i < shipLens.length; i++) {
-    const ship = createShip(i + 1, shipLens[i]);
+    const ship = createShip(i + 1, null, shipLens[i]);
     ships[ship.id] = ship;
   }
   return ships;

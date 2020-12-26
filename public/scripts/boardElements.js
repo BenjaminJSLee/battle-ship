@@ -1,21 +1,37 @@
+const createLog = function() {
+  const $log = $(`
+    <div data-id="log" class="log">
+    </div>
+  `);
+  return $log;
+};
+
+const addLogMsg = function($target, msg) {
+  $target.append(`
+    <div class="message">${msg}</div>
+  `);
+};
+
+const createButton = function(action, txt = null) {
+  return $(`<button class="${action}" data-button-id="${action}">${txt || action}</button>`);
+};
+
 const createStatsElement = function() {
+  const $log = createLog();
+  const $rotate = createButton("rotate", `<i class="fas fa-sync-alt"></i>`);
+  const $save = createButton("save");
+  const $buttons = $(`<div class="buttons"></div>`).append($rotate, $save);
   const $stats = $(`
     <div class="stats">
       <div class="shots">
         <div class="hits">Hits: <span>0</span></div>
         <div class="misses">Misses: <span>0</span></div>
       </div>
-      <div data-button-id="rotate" class="rotate">
-        <i class="fas fa-sync-alt"></i>
-      </div>
     </div> 
   `);
+  $stats.prepend($buttons).append($log);
   return $stats;
 }
-
-const createButton = function(action, txt = null) {
-  return $(`<button class="${action}" data-button-id="${action}">${txt || action}</button>`);
-};
 
 const createBoardElement = function(rows, cols, id) {
   const $board = $(`
@@ -42,7 +58,7 @@ const createBoardElement = function(rows, cols, id) {
 };
 
 const createGameElement = function(rows, cols, players) {
-  const $gameStage = $(`<section id="stage"><div class="buttons"></div></section>`);
+  const $gameStage = $(`<section id="stage"></section>`);
 
   const $gameContainer = $(`<div class="game-container"></div>`);
   for (let i = 0; i < players; i++) {

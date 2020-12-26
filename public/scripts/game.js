@@ -1,20 +1,63 @@
 
-const getCombatHandlers = function({ $game, rows, cols }, {id, shots, ships}, transition) {
+const toggleShipsView = function($game, player) {
+  const $board = $game.find(`[data-board=${player.id}]`);
+  const $ships = $board.find(`[data-ship-id]`);
+  if ($ships.length !== 0) {
+    $ships.removeAttr("data-ship-id");
+    return;
+  }
+  const ships = player.ships;
+  for (const id in ships) {
+    const { start, end } = ships[id];
+    const isVert = start.x === end.x;
+    for (let i = Number(isVert ? start.y : start.x) ; i <= Number(isVert ? end.y : end.x); i++) {
+      const $tuple = $board.find(`[data-${isVert ? "row" : "col"}=${i}][data-${!isVert ? `row=${start.y}` : `col=${start.x}`}]`);
+      $tuple.attr("data-ship-id",`${id}`);
+    }
+  }
+}
+
+const areAllSunk = function(board, players) {
+  const { ships } = players[board];
+  for (const id in ships) {
+    if (!ships[id].isSunk()) return false;
+  }
+  return true;
+}
+
+const checkShot = function({ x, y }, ships) {
+  for (const id in ships) {
+    let ship = ships[id];
+    if (ship.isHit({x, y})) {
+      return ship.isSunk() ? `${ship.name} hit and sunk!` : "hit";
+    }
+  }
+  return "miss";
+};
+
+const getCombatHandlers = function({ $game, rows, cols }, player, players, transition) {
+  const {shots, ships} = players[player];
   const events = [];
   const coord = { board: null, x: null, y: null };
   let numShots = 0;
+
+  const toggleShipClickHandler = function() {
+    toggleShipsView($game, players[player]);
+  }
+  events.push({ $target: $game.find(`[data-button-id="toggle-visible"]`), type: "click", handler: toggleShipClickHandler});
+
   const boardClickHandler = function(evt) {
     const $target = $(evt.target);
     const row = Number($target.attr(`data-row`));
     const col = Number($target.attr(`data-col`));
-    if (Number.isNaN(row) || Number.isNaN(col)) return;
+    if (Number.isNaN(row) || Number.isNaN(col) || shots[`${col}-${row}`] !== undefined) return;
     $(this).find(`.tuple.selected`).removeClass(`selected`);
     $target.addClass(`selected`);
-    coord.x = col;
-    coord.y = row;
+    coord.x = `${col}`;
+    coord.y = `${row}`;
     coord.board = $(this).attr("data-board");
   };
-  events.push({ $target: $game.find(`[data-board][data-board!="${id}"]`), type: "click", handler: boardClickHandler});
+  events.push({ $target: $game.find(`[data-board][data-board!="${player}"]`), type: "click", handler: boardClickHandler});
 
   const boardHoverHandler = function(evt) {
     const $target = $(evt.target);
@@ -24,21 +67,25 @@ const getCombatHandlers = function({ $game, rows, cols }, {id, shots, ships}, tr
     $(this).find(`.tuple.hover`).removeClass(`hover`);
     $target.addClass(`hover`);
   };
-  events.push({ $target: $game.find(`[data-board][data-board!="${id}"]`), type: "mouseover", handler: boardHoverHandler});
+  events.push({ $target: $game.find(`[data-board][data-board!="${player}"]`), type: "mouseover", handler: boardHoverHandler});
   
   const boardOutHandler = function() {
     $(this).find(`.hover`).removeClass("hover");
   };
-  events.push({ $target: $game.find(`[data-board][data-board!="${id}"]`), type: "mouseout", handler: boardOutHandler});
+  events.push({ $target: $game.find(`[data-board][data-board!="${player}"]`), type: "mouseout", handler: boardOutHandler});
 
   const fireHandler = function() {
-    if (coord.x === null || coord.y === null || shots[`${coord.x}-${coord.y}`] !== undefined) return;
-    shots[`${coord.x}-${coord.y}`] = false;
+    if (coord.x === null || coord.y === null || coord.board === null || shots[`${coord.x}-${coord.y}`] !== undefined) return;
+    const shotType = checkShot(coord, players[coord.board].ships);
+    shots[`${coord.x}-${coord.y}`] = { board: coord.board, shotNumber: shots.total, shotType };
+    const msg = `${players[player].name} shoots at ${String.fromCharCode('A'.charCodeAt(0) + Number(coord.x))}${Number(coord.y) + 1}: ${shotType}`;
+    addLogMsg($game.find(`[data-id="log"]`), msg);
+    shots.total += 1;
     numShots += 1;
-    const $tuple = $game.find(`[data-board][data-board!="${id}"] .selected`).removeClass("selected");
-    $tuple.append($(`<div class="missile ${shots[`${coord.x}-${coord.y}`] ? "hit" : "miss"}"></div>`));
+    const $tuple = $game.find(`[data-board][data-board!="${player}"] .selected`).removeClass("selected");
+    $tuple.append($(`<div class="missile ${shotType !== "miss" ? "hit" : "miss"}"></div>`));
     if (numShots >= shots.max) {
-      $game.find(`[data-board][data-board!="${id}"] .hover`).removeClass("hover");
+      $game.find(`[data-board][data-board!="${player}"] .hover`).removeClass("hover");
       transition("NEXT_TURN");
     }
   };
@@ -48,12 +95,13 @@ const getCombatHandlers = function({ $game, rows, cols }, {id, shots, ships}, tr
   return events;
 }
 
-const startCombat = function({ $game, rows, cols }, player, transition) {
-  if (player.type === "AI") {
+const startCombat = function(game, player, players, transition) {
+  if (players[player].type === "AI") {
     return [];
-  } 
-  $game.find(`.buttons`).replaceWith(createButton("fire"));
-  return getCombatHandlers({ $game, rows, cols }, player, transition);
+  } else if (players[player].type === "LOCAL") {
+    game.$game.find(`[data-board] [data-ship-id]`).removeAttr("data-ship-id");
+    return getCombatHandlers(game, player, players, transition);
+  }
 };
 
 const getSetUpHandlers = function({ $game, rows, cols }, {id, ships}, transition) {
@@ -71,7 +119,10 @@ const getSetUpHandlers = function({ $game, rows, cols }, {id, ships}, transition
     const shipId = $target.attr(`data-ship-id`);
     if (shipId === undefined) return;
     if (curShip === shipId) {
-      isVert = !isVert;
+      $game.find(`[data-ship-id="${curShip}"].tuple`).removeAttr("data-ship-id");
+      $target.removeClass("placed");
+      ships[curShip] = {...ships[curShip], start: {x: null, y: null}, end: {x: null, y: null}};
+      return;
     }
     curShip = shipId;
     $target.parent().children().removeClass("selected");
@@ -102,6 +153,7 @@ const getSetUpHandlers = function({ $game, rows, cols }, {id, ships}, transition
     for(const $tile of shipTiles) {
       $tile.attr("data-ship-id",curShip);
     }
+    $game.find(`.stats [data-ship-id=${curShip}]`).addClass(`placed`);
     const start = { x: shipTiles[0].attr("data-col"), y: shipTiles[0].attr("data-row") };
     const end = { x: shipTiles[shipTiles.length - 1].attr("data-col"), y: shipTiles[shipTiles.length - 1].attr("data-row") };
     ships[curShip] = {...ship, start, end};
@@ -144,6 +196,7 @@ const setUpGame = function(game, player, transition) {
   if (player.type === "AI") {
     return [];
   } else if (player.type === "LOCAL") {
+    game.$game.find(`[data-board] [data-ship-id]`).removeAttr("data-ship-id");
     return getSetUpHandlers(game, player, transition);
   }
 }
@@ -169,13 +222,13 @@ const setPhaseOpts = function(game, players, setGameData) {
   return {
     START: function(evts, player, transition) {
       removeEventHandlers(evts);
-      const newEvts = startCombat(game, players[player], transition);
+      const newEvts = startCombat(game, player, players, transition);
       setGameData(newEvts, null);
       setEventHandlers(newEvts);
     },
     SETUP: function(evts, player, transition) {
       removeEventHandlers(evts);
-      const newEvts = getSetUpHandlers(game, players[player], transition);
+      const newEvts = setUpGame(game, players[player], transition);
       setGameData(newEvts, null);
       setEventHandlers(newEvts);
     },
@@ -189,7 +242,13 @@ const setPhaseOpts = function(game, players, setGameData) {
     NEXT_SETUP: function(evts, player, transition) {
       const nextPlayer = (player + 1) % players.length;
       shiftSpotlight(game.$game, nextPlayer);
-      if (nextPlayer === 0) return transition("START");
+      if (nextPlayer === 0) {
+        game.$game.find(`.buttons`).replaceWith(
+          createButton("fire"),
+          createButton("toggle-visible", "Show/hide ships")
+        );
+        return transition("START");
+      }
       setGameData(evts, nextPlayer);
       transition("SETUP");
     },
@@ -219,10 +278,9 @@ const setupPhase = function(game, players) {
 };
 
 const createGame = function({rows, cols}, maxShots = 1) {
-  const { $ships, shipsArr } = setupShips();
+  const { $ships, shipsArr } = setupShips([2]);
   const $game = createGameElement(rows, cols, 2);
   $game.find(`div.stats`).prepend($ships);
-  $game.find(`div.buttons`).prepend(createButton("save"));
   const players = [ createPlayer(0, shipsArr[0], maxShots, "LOCAL"), createPlayer(1, shipsArr[1], maxShots, "LOCAL") ];
   shiftSpotlight($game, 0);
 
