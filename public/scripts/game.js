@@ -5,10 +5,10 @@ const toggleShipsView = function($game, player = null, shipId = null) {
   if ($ships.length !== 0) {
     $ships.removeClass("start").removeClass("end");
     $ships.removeAttr("data-ship-id").removeAttr("data-vertical");
-    if (shipId === null) return;
+    if (shipId === null) return false;
   }
   if (!player) {
-    return;
+    return false;
   }
   const ships = shipId ? { [shipId]: player.ships[shipId] } : player.ships;
   for (const id in ships) {
@@ -25,6 +25,7 @@ const toggleShipsView = function($game, player = null, shipId = null) {
       if (i === endInd) $tuple.addClass("end");
     }
   }
+  return true;
 }
 
 const areAllSunk = function(board, players) {
@@ -261,6 +262,9 @@ const setPhaseOpts = function(game, players, setGameData) {
     },
     VICTORY: function(evts, player) {
       removeEventHandlers(evts);
+      for (const player of players) {
+        if (!toggleShipsView(game.$game, player)) toggleShipsView(game.$game, player);
+      }
       alert(`${players[player].name} wins!`);
     },
     DEFEAT: function() {

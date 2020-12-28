@@ -23,7 +23,11 @@ const createStatsElement = function() {
   const $stats = $(`<div class="stats"></div>`);
   $stats.append($log, $buttons);
   return $stats;
-}
+};
+
+const createTurnDisplay = function() {
+
+};
 
 const createBoardElement = function(rows, cols, id) {
   const $board = $(`
