@@ -322,20 +322,6 @@ div.game-board div.table-body div.row div.bottom.right {
   border-radius: 0em 0em 0.5em 0em;
 }
 
-div.spotlight div.game-board div.table-body div.row > * {
-  border: 0.1em solid grey;
-}
-
-div.spotlight div.game-board div.table-body div.row > *.tuple.hover {
-  border: 0.1em solid black;
-  background-color: darkgrey;
-}
-
-div.spotlight div.game-board div.table-body div.row > *.tuple.selected {
-  border: 0.1em solid #ff7676;
-  background-color: red;
-}
-
 div[data-board].game-board div.table-body div.row div.tuple {
   display: flex;
   justify-content: center;
@@ -349,18 +335,18 @@ div[data-board].game-board div.table-body div.row div.tuple[data-ship-id] {
 }
 
 div[data-board].game-board div.table-body div.row div.tuple[data-ship-id]:not([data-vertical]) {
-  padding-left: 0.05em;
-  padding-right: 0.05em;
+  padding-left: 1px;
+  padding-right: 1px;
 }
 
 div[data-board].game-board div.table-body div.row div.tuple[data-ship-id]:not([data-vertical]).start {
   padding-left: 0em;
-  border-left: 0.1em solid;
+  border-left: 0.05em solid;
 }
 
 div[data-board].game-board div.table-body div.row div.tuple[data-ship-id]:not([data-vertical]).end {
   padding-right: 0em;
-  border-right: 0.1em solid;
+  border-right: 0.05em solid;
 }
 
 div[data-board].game-board div.table-body div.row div.tuple[data-ship-id][data-vertical] {
@@ -368,11 +354,11 @@ div[data-board].game-board div.table-body div.row div.tuple[data-ship-id][data-v
 }
 
 div[data-board].game-board div.table-body div.row div.tuple[data-ship-id][data-vertical].start {
-  border-top: 0.1em solid;
+  border-top: 0.05em solid;
 }
 
 div[data-board].game-board div.table-body div.row div.tuple[data-ship-id][data-vertical].end {
-  border-bottom: 0.1em solid;
+  border-bottom: 0.05em solid;
 }
 
 div[data-board].game-board div.table-body div.row div.tuple div.missile {
@@ -391,6 +377,53 @@ div[data-board].game-board div.table-body div.row div.tuple div.missile.hit {
 div[data-board].game-board div.table-body div.row div.tuple div.missile.miss {
   border-color: black;
   background-color: white;
+}
+
+div.spotlight div.game-board div.table-body div.row > * {
+  border: 0.1em solid grey;
+}
+
+div.spotlight div.game-board div.table-body div.row > *.tuple.hover {
+  border: 0.1em solid black;
+  background-color: darkgrey;
+}
+
+div.spotlight div.game-board div.table-body div.row > *.tuple.selected {
+  border: 0.1em solid #ff7676;
+  background-color: red;
+}
+
+div.spotlight div.game-board div.table-body div.row > *.tuple[data-ship-id] {
+  background-color: green;
+  border-color: black;
+  border-style: solid none solid none;
+}
+
+div.spotlight div.game-board div.table-body div.row > *.tuple[data-ship-id]:not([data-vertical]) {
+  padding-left: 0.1em;
+  padding-right: 0.1em;
+}
+
+div.spotlight div.game-board div.table-body div.row > *.tuple[data-ship-id]:not([data-vertical]).start {
+  padding-left: 0em;
+  border-left: 0.1em solid;
+}
+
+div.spotlight div.game-board div.table-body div.row > *.tuple[data-ship-id]:not([data-vertical]).end {
+  padding-right: 0em;
+  border-right: 0.1em solid;
+}
+
+div.spotlight div.game-board div.table-body div.row > *.tuple[data-ship-id][data-vertical] {
+  border-style: none solid none solid;
+}
+
+div.spotlight div.game-board div.table-body div.row > *.tuple[data-ship-id][data-vertical].start {
+  border-top: 0.1em solid;
+}
+
+div.spotlight div.game-board div.table-body div.row > *.tuple[data-ship-id][data-vertical].end {
+  border-bottom: 0.1em solid;
 }
 
 div.ships {

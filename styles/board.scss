@@ -47,23 +47,6 @@ div.game-board {
   }
 }
 
-div.spotlight div.game-board div.table-body {
-  
-  div.row > * {
-    border: 0.1em solid grey;
-    &.tuple {
-      &.hover {
-        border: 0.1em solid black;
-        background-color: darkgrey;
-      }
-      &.selected {
-        border: 0.1em solid rgb(255, 118, 118);
-        background-color: red;
-      }
-    }
-  }
-}
-
 div[data-board].game-board div.table-body div.row div.tuple {
   display: flex;
   justify-content: center;
@@ -73,24 +56,24 @@ div[data-board].game-board div.table-body div.row div.tuple {
     border-color: black;
     border-style: solid none solid none;
     &:not([data-vertical]) {
-      padding-left: 0.05em;
-      padding-right: 0.05em;
+      padding-left: 1px;
+      padding-right: 1px;
       &.start {
         padding-left: 0em;
-        border-left: 0.1em solid;
+        border-left: 0.05em solid;
       }
       &.end {
         padding-right: 0em;
-        border-right: 0.1em solid;
+        border-right: 0.05em solid;
       }
     }
     &[data-vertical] {
       border-style: none solid none solid;
       &.start {
-        border-top: 0.1em solid;
+        border-top: 0.05em solid;
       }
       &.end {
-        border-bottom: 0.1em solid;
+        border-bottom: 0.05em solid;
       }
     }
   }
@@ -107,6 +90,50 @@ div[data-board].game-board div.table-body div.row div.tuple {
     &.miss {
       border-color: black;
       background-color: white;
+    }
+  }
+}
+
+div.spotlight div.game-board div.table-body {
+  
+  div.row > * {
+    border: 0.1em solid grey;
+    &.tuple {
+      &.hover {
+        border: 0.1em solid black;
+        background-color: darkgrey;
+      }
+      &.selected {
+        border: 0.1em solid rgb(255, 118, 118);
+        background-color: red;
+      }
+
+      &[data-ship-id] {
+        background-color: green;
+        border-color: black;
+        border-style: solid none solid none;
+        &:not([data-vertical]) {
+          padding-left: 0.1em;
+          padding-right: 0.1em;
+          &.start {
+            padding-left: 0em;
+            border-left: 0.1em solid;
+          }
+          &.end {
+            padding-right: 0em;
+            border-right: 0.1em solid;
+          }
+        }
+        &[data-vertical] {
+          border-style: none solid none solid;
+          &.start {
+            border-top: 0.1em solid;
+          }
+          &.end {
+            border-bottom: 0.1em solid;
+          }
+        }
+      }
     }
   }
 }

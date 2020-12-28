@@ -1,12 +1,13 @@
 
 const toggleShipsView = function($game, player = null, shipId = null) {
   const $board = $game.find(`[data-board${ player ? `=${player.id}` : "" }]`);
-  const $ships = $board.find(`[data-ship-id${shipId ? `=${shipId}` : "" }]`);
+  const $ships = $board.find(`[data-ship-id${shipId !== null ? `=${shipId}` : "" }]`);
   if ($ships.length !== 0) {
     $ships.removeClass("start").removeClass("end");
     $ships.removeAttr("data-ship-id").removeAttr("data-vertical");
-    return;
-  } else if (!player) {
+    if (shipId === null) return;
+  }
+  if (!player) {
     return;
   }
   const ships = shipId ? { [shipId]: player.ships[shipId] } : player.ships;
@@ -62,8 +63,8 @@ const getCombatHandlers = function({ $game, rows, cols }, player, players, trans
     if (Number.isNaN(row) || Number.isNaN(col) || shots[`${col}-${row}`] !== undefined) return;
     $(this).find(`.tuple.selected`).removeClass(`selected`);
     $target.addClass(`selected`);
-    coord.x = `${col}`;
-    coord.y = `${row}`;
+    coord.x = col;
+    coord.y = row;
     coord.board = $(this).attr("data-board");
   };
   events.push({ $target: $game.find(`[data-board][data-board!="${player}"]`), type: "click", handler: boardClickHandler});
@@ -86,8 +87,9 @@ const getCombatHandlers = function({ $game, rows, cols }, player, players, trans
   const fireHandler = function() {
     if (coord.x === null || coord.y === null || coord.board === null || shots[`${coord.x}-${coord.y}`] !== undefined) return;
     const shotType = checkShot(coord, players[coord.board].ships);
+    if (shotType !== "MISS" && areAllSunk(coord.board, players)) return transition("VICTORY");
     shots[`${coord.x}-${coord.y}`] = { board: coord.board, shotNumber: shots.total, shotType };
-    const msg = `${players[player].name} shoots at ${String.fromCharCode('A'.charCodeAt(0) + Number(coord.x))}${Number(coord.y) + 1}: ${shotType}`;
+    const msg = `${players[player].name} shoots at ${String.fromCharCode('A'.charCodeAt(0) + coord.x)}${coord.y + 1}: ${shotType}`;
     addLogMsg($game.find(`[data-id="log"]`), msg);
     shots.total += 1;
     numShots += 1;
@@ -96,6 +98,7 @@ const getCombatHandlers = function({ $game, rows, cols }, player, players, trans
     if (numShots >= shots.max) {
       $game.find(`[data-board][data-board!="${player}"] .hover`).removeClass("hover");
       transition("NEXT_TURN");
+      return;
     }
   };
   events.push({ $target: $game.find(`[data-button-id="fire"]`), type: "click", handler: fireHandler});
@@ -113,7 +116,8 @@ const startCombat = function(game, player, players, transition) {
   }
 };
 
-const getSetUpHandlers = function({ $game, rows, cols }, {id, ships}, transition) {
+const getSetUpHandlers = function({ $game, rows, cols }, player, transition) {
+  const {id, ships} = player;
   const events = [];
   let curShip = null;
   let isVert = true;
@@ -142,31 +146,24 @@ const getSetUpHandlers = function({ $game, rows, cols }, {id, ships}, transition
   const boardClickHandler = function(evt) {
     if (!ships[curShip]) return;
     let ship = ships[curShip];
-    if (isVert && ship.length > rows) return;
-    if (!isVert && ship.length > cols) return;
+    if ((isVert && ship.length > rows) || (!isVert && ship.length > cols)) return;
     const $target = $(evt.target);
     const row = Number($target.attr(`data-row`));
     const col = Number($target.attr(`data-col`));
     if (Number.isNaN(row) || Number.isNaN(col)) return;
     const $board = $(this);
     const shipStart = getAdjustedPos(isVert, ship.length, {row, col}, {rows, cols});
-    const shipTiles = [];
     for(let i = shipStart; i < shipStart + ship.length; i++) {
       const $tile = $board
         .find(`[data-${isVert ? "row" : "col"}=${i}][data-${!isVert ? `row=${row}` : `col=${col}`}]`);
       const shipId = $tile.attr('data-ship-id');
       if (shipId !== undefined && shipId !== curShip) return;
-      shipTiles.push($tile);
     }
-    $board.find(`[data-ship-id="${curShip}"].tuple`).removeAttr("data-ship-id").removeAttr("data-vertical");
-    for(const $tile of shipTiles) {
-      $tile.attr("data-ship-id",curShip);
-      if (isVert) $tile.attr("data-vertical", "");
-    }
-    $game.find(`.stats [data-ship-id=${curShip}]`).addClass(`placed`);
-    const start = { x: shipTiles[0].attr("data-col"), y: shipTiles[0].attr("data-row") };
-    const end = { x: shipTiles[shipTiles.length - 1].attr("data-col"), y: shipTiles[shipTiles.length - 1].attr("data-row") };
+    const start = { x: isVert ? col : shipStart, y: isVert ? shipStart : row };
+    const end = { x: isVert ? col : shipStart + ship.length - 1, y: isVert ? shipStart + ship.length - 1 : row };
     ships[curShip] = {...ship, start, end};
+    toggleShipsView($game, player, curShip);
+    $game.find(`.stats [data-ship-id=${curShip}]`).addClass(`placed`);
   };
   events.push({ $target: $game.find(`[data-board][data-board="${id}"]`), type: "click", handler: boardClickHandler});
 
@@ -262,8 +259,9 @@ const setPhaseOpts = function(game, players, setGameData) {
       setGameData(evts, nextPlayer);
       transition("SETUP");
     },
-    VICTORY: function() {
-
+    VICTORY: function(evts, player) {
+      removeEventHandlers(evts);
+      alert(`${players[player].name} wins!`);
     },
     DEFEAT: function() {
 
@@ -288,7 +286,7 @@ const setupPhase = function(game, players) {
 };
 
 const createGame = function({rows, cols}, maxShots = 1) {
-  const { $ships, shipsArr } = setupShips([2]);
+  const { $ships, shipsArr } = setupShips([2,2]);
   const $game = createGameElement(rows, cols, 2);
   $game.find(`div.stats`).prepend($ships);
   const players = [ createPlayer(0, shipsArr[0], maxShots, "LOCAL"), createPlayer(1, shipsArr[1], maxShots, "LOCAL") ];
