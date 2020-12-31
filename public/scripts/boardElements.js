@@ -25,15 +25,14 @@ const createStatsElement = function() {
   return $stats;
 };
 
-const createTurnDisplay = function() {
-
+const createBillboard = function() {
+  const $display = $(`<div data-billboard class="billboard"></div>`);
+  const $msg = $(`<div class="billboard-content"></div>`);
+  return $display.append($msg);
 };
 
 const createBoardElement = function(rows, cols, id) {
-  const $board = $(`
-    <div data-board="${id}" class="game-board">
-    </div>
-  `);
+  const $board = $(`<div data-board="${id}" class="game-board"></div>`);
   const $table = $(`<div class="table-body"></div>`);
   const $xAxis = $(`<div class="row" ><div class="axis-label"></div></div>`);
   for(let i = 0; i < rows; i++) {
@@ -63,7 +62,8 @@ const createGameElement = function(rows, cols, players) {
   }
 
   $gameStage.prepend($gameContainer);
+  $gameStage.prepend(createBillboard());
   $gameStage.prepend(createStatsElement());
 
   return $gameStage;
-}
+};

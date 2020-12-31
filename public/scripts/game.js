@@ -1,51 +1,4 @@
 
-const toggleShipsView = function($game, player = null, shipId = null) {
-  const $board = $game.find(`[data-board${ player ? `=${player.id}` : "" }]`);
-  const $ships = $board.find(`[data-ship-id${shipId !== null ? `=${shipId}` : "" }]`);
-  if ($ships.length !== 0) {
-    $ships.removeClass("start").removeClass("end");
-    $ships.removeAttr("data-ship-id").removeAttr("data-vertical");
-    if (shipId === null) return false;
-  }
-  if (!player) {
-    return false;
-  }
-  const ships = shipId ? { [shipId]: player.ships[shipId] } : player.ships;
-  for (const id in ships) {
-    const { start, end } = ships[id];
-    const isVert = start.x === end.x;
-    const startInd =  Number(isVert ? start.y : start.x);
-    const endInd = Number(isVert ? end.y : end.x);
-    if (Number.isNaN(startInd) || Number.isNaN(endInd)) return;
-    for (let i = startInd; i <= endInd; i++) {
-      const $tuple = $board.find(`[data-${isVert ? "row" : "col"}=${i}][data-${!isVert ? `row=${start.y}` : `col=${start.x}`}]`);
-      $tuple.attr("data-ship-id",`${id}`);
-      if (isVert) $tuple.attr("data-vertical", "");
-      if (i === startInd) $tuple.addClass("start");
-      if (i === endInd) $tuple.addClass("end");
-    }
-  }
-  return true;
-}
-
-const areAllSunk = function(board, players) {
-  const { ships } = players[board];
-  for (const id in ships) {
-    if (!ships[id].isSunk()) return false;
-  }
-  return true;
-}
-
-const checkShot = function({ x, y }, ships) {
-  for (const id in ships) {
-    let ship = ships[id];
-    if (ship.isHit({x, y})) {
-      return ship.isSunk() ? `${ship.name} HIT and SUNK!` : "HIT";
-    }
-  }
-  return "MISS";
-};
-
 const getCombatHandlers = function({ $game, rows, cols }, player, players, transition) {
   const {shots, ships} = players[player];
   const events = [];
@@ -88,7 +41,6 @@ const getCombatHandlers = function({ $game, rows, cols }, player, players, trans
   const fireHandler = function() {
     if (coord.x === null || coord.y === null || coord.board === null || shots[`${coord.x}-${coord.y}`] !== undefined) return;
     const shotType = checkShot(coord, players[coord.board].ships);
-    if (shotType !== "MISS" && areAllSunk(coord.board, players)) return transition("VICTORY");
     shots[`${coord.x}-${coord.y}`] = { board: coord.board, shotNumber: shots.total, shotType };
     const msg = `${players[player].name} shoots at ${String.fromCharCode('A'.charCodeAt(0) + coord.x)}${coord.y + 1}: ${shotType}`;
     addLogMsg($game.find(`[data-id="log"]`), msg);
@@ -96,6 +48,7 @@ const getCombatHandlers = function({ $game, rows, cols }, player, players, trans
     numShots += 1;
     const $tuple = $game.find(`[data-board][data-board!="${player}"] .selected`).removeClass("selected");
     $tuple.append($(`<div class="missile ${shotType !== "MISS" ? "hit" : "miss"}"></div>`));
+    if (shotType !== "MISS" && areAllSunk(coord.board, players)) return transition("VICTORY");
     if (numShots >= shots.max) {
       $game.find(`[data-board][data-board!="${player}"] .hover`).removeClass("hover");
       transition("NEXT_TURN");
@@ -192,7 +145,7 @@ const getSetUpHandlers = function({ $game, rows, cols }, player, transition) {
   events.push({ $target: $game.find(`[data-board][data-board="${id}"]`), type: "mouseout", handler: boardOutHandler});
 
   const boardSubmitHandler = function() {
-    if (!areValid(ships)) return $game.find(`[data-id="log"]`).append(createError("All ships must be added before starting"));
+    if (!areValid(ships)) return $game.find(`.stats`).after(createError("All ships must be added before starting"));
     transition("NEXT_SETUP");
   };
   events.push({ $target: $game.find(`[data-button-id="save"]`), type: "click", handler: boardSubmitHandler});
@@ -289,8 +242,8 @@ const setupPhase = function(game, players) {
   transition("SETUP");
 };
 
-const createGame = function({rows, cols}, maxShots = 1) {
-  const { $ships, shipsArr } = setupShips([2,2]);
+const createGame = function({ rows = 10, cols = 10, maxShots = 1 }) {
+  const { $ships, shipsArr } = setupShips();
   const $game = createGameElement(rows, cols, 2);
   $game.find(`div.stats`).prepend($ships);
   const players = [ createPlayer(0, shipsArr[0], maxShots, "LOCAL"), createPlayer(1, shipsArr[1], maxShots, "LOCAL") ];

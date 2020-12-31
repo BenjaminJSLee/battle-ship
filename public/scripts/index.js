@@ -6,7 +6,7 @@ $( function() {
     changeMusic(null, true);
     $(this).off();
   });
-  $("#vs-ai").on('click', function() {
+  $("#2-player").on('click', function() {
     $('main').empty();
     changeMusic(`/sounds/sea-shanty.mp3`, true);
     $('main').append(createGame({rows: 10, cols: 10}));

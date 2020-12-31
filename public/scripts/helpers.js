@@ -46,3 +46,50 @@ const areValid = function(ships) {
   }
   return true;
 };
+
+const toggleShipsView = function($game, player = null, shipId = null) {
+  const $board = $game.find(`[data-board${ player ? `=${player.id}` : "" }]`);
+  const $ships = $board.find(`[data-ship-id${shipId !== null ? `=${shipId}` : "" }]`);
+  if ($ships.length !== 0) {
+    $ships.removeClass("start").removeClass("end");
+    $ships.removeAttr("data-ship-id").removeAttr("data-vertical");
+    if (shipId === null) return false;
+  }
+  if (!player) {
+    return false;
+  }
+  const ships = shipId ? { [shipId]: player.ships[shipId] } : player.ships;
+  for (const id in ships) {
+    const { start, end } = ships[id];
+    const isVert = start.x === end.x;
+    const startInd =  Number(isVert ? start.y : start.x);
+    const endInd = Number(isVert ? end.y : end.x);
+    if (Number.isNaN(startInd) || Number.isNaN(endInd)) return;
+    for (let i = startInd; i <= endInd; i++) {
+      const $tuple = $board.find(`[data-${isVert ? "row" : "col"}=${i}][data-${!isVert ? `row=${start.y}` : `col=${start.x}`}]`);
+      $tuple.attr("data-ship-id",`${id}`);
+      if (isVert) $tuple.attr("data-vertical", "");
+      if (i === startInd) $tuple.addClass("start");
+      if (i === endInd) $tuple.addClass("end");
+    }
+  }
+  return true;
+}
+
+const areAllSunk = function(board, players) {
+  const { ships } = players[board];
+  for (const id in ships) {
+    if (!ships[id].isSunk()) return false;
+  }
+  return true;
+}
+
+const checkShot = function({ x, y }, ships) {
+  for (const id in ships) {
+    let ship = ships[id];
+    if (ship.isHit({x, y})) {
+      return ship.isSunk() ? `${ship.name} HIT and SUNK!` : "HIT";
+    }
+  }
+  return "MISS";
+};

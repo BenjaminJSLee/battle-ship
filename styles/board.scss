@@ -79,9 +79,9 @@ div[data-board].game-board div.table-body div.row div.tuple {
   }
   div.missile {
     display: inline-flex;
-    height: 70%;
-    margin-left: 15%;
-    margin-right: 15%;
+    height: 60%;
+    margin-left: 20%;
+    margin-right: 20%;
     border-radius: 100%;
     &.hit {
       border-color: green;

@@ -254,15 +254,39 @@ button:hover {
 
 #stage .stats .log {
   text-align: left;
-  padding: 0.4em;
   margin: 0.5em;
   width: 40%;
   height: 80%;
+  border: 1px solid black;
   overflow-y: auto;
 }
 
 #stage .stats .log .message {
-  margin: 0.2em;
+  padding: 0.4em;
+  width: 100%;
+}
+
+#stage .stats .log .message:nth-child(even) {
+  background-color: white;
+}
+
+#stage .stats .log .message:nth-child(odd) {
+  background-color: lightblue;
+}
+
+#stage .stats .log .message:last-child {
+  font-weight: bold;
+}
+
+.billboard {
+  width: 100%;
+  height: 1.5em;
+  background-color: aliceblue;
+}
+
+.billboard .billboard-content {
+  margin: auto;
+  background-color: skyblue;
 }
 
 div.game-board {
@@ -363,9 +387,9 @@ div[data-board].game-board div.table-body div.row div.tuple[data-ship-id][data-v
 
 div[data-board].game-board div.table-body div.row div.tuple div.missile {
   display: inline-flex;
-  height: 70%;
-  margin-left: 15%;
-  margin-right: 15%;
+  height: 60%;
+  margin-left: 20%;
+  margin-right: 20%;
   border-radius: 100%;
 }
 
